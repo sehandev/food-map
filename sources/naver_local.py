@@ -10,18 +10,23 @@ from find_name import kakao_log_to_nouns
 with open("../datas/category_list.txt", 'r') as file:
     categories = file.read().split('\n')
 
-except_file = "../datas/except_list.txt"
-excepts = set()
+# except_file = "../datas/except_list.txt"
+# excepts = set()
+
+검색결과수 = "30"
+검색시작위치 = "1"
+
+# sehan
+# client_id = "7Ph92HhYly6BfwHkncbM"
+# client_secret = "PWciOMPN_p"
+
+# maylily
+clinet_id = "6AkDMh30q3LjxKzZC2Oo"
+client_secret = "KghRTtlRZu"
 
 
-def search_local(검색어):
-    검색결과수 = "30"
-    검색시작위치 = "1"
-
-    client_id = "7Ph92HhYly6BfwHkncbM"
-    client_secret = "PWciOMPN_p"
-
-    검색어 = urllib.parse.quote(검색어)
+def search_local(query):
+    검색어 = urllib.parse.quote(query)
     url = "https://openapi.naver.com/v1/search/local"
     url += "?query=" + 검색어
     url += "&display=" + 검색결과수
@@ -40,7 +45,7 @@ def search_local(검색어):
         else:
             print("Error Code:" + rescode)
     except:
-        print("error : " + 검색어)
+        print("error : " + query)
         return False
 
 
@@ -104,20 +109,19 @@ def is_rastaurant(query):
                 for left in lefts:
                     if left in tmp:
                         t = tmp.index(left)
-                # results[1].append([{"title": origin_title, "category": category, "address": item["roadAddress"]}, t])
+                results[1].append([{"title": origin_title, "category": category, "address": item["roadAddress"]}, t])
 
             # 3단계 : 유사 title
             else:
-                # results[2].append([{"title": origin_title, "category": category, "address": item["roadAddress"]}, similar_score])
-                pass
+                results[2].append([{"title": origin_title, "category": category, "address": item["roadAddress"]}, similar_score])
 
     results[1].sort(key=lambda x: x[1])
     for i in range(len(results[1])):
         results[1][i] = results[1][i][0]
 
-    # results[2].sort(key=lambda x: x[1], reverse=True)
-    # for i in range(len(results[2])):
-    #     results[2][i] = results[2][i][0]
+    results[2].sort(key=lambda x: x[1], reverse=True)
+    for i in range(len(results[2])):
+        results[2][i] = results[2][i][0]
 
     check = 2
 
@@ -142,7 +146,7 @@ def check_name(query):
         # print_result(5, results, i)
     elif check == 2:
         count = 6
-        for i in range(3):
+        for i in range(2):
             count = print_result(count, results, i)
         excepts.add(query)
         print()
@@ -158,6 +162,6 @@ if __name__ == "__main__":
             for name in names:
                 if len(name) > 2:
                     check_name(name)
-    with open(except_file, 'w') as file:
-        for ex in excepts:
-            file.write(ex + '\n')
+    # with open(except_file, 'w') as file:
+    #     for ex in excepts:
+    #         file.write(ex + '\n')

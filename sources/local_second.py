@@ -18,9 +18,11 @@ excepts = set()
 검색결과수 = "30"
 검색시작위치 = "1"
 
+# sehan
 # client_id = "7Ph92HhYly6BfwHkncbM"
 # client_secret = "PWciOMPN_p"
 
+# maylily
 clinet_id = "6AkDMh30q3LjxKzZC2Oo"
 client_secret = "KghRTtlRZu"
 
