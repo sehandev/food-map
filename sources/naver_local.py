@@ -21,7 +21,7 @@ with open("../datas/category_list.txt", 'r') as file:
 # client_secret = "PWciOMPN_p"
 
 # maylily
-clinet_id = "6AkDMh30q3LjxKzZC2Oo"
+client_id = "6AkDMh30q3LjxKzZC2Oo"
 client_secret = "KghRTtlRZu"
 
 
@@ -47,22 +47,6 @@ def search_local(query):
     except:
         print("error : " + query)
         return False
-
-
-def print_result(count, results, index):
-    length = len(results[index])
-    if length == 0:
-        # print(str(index + 1) + "순위 결과 없음")
-        pass
-    elif count - length > 0:
-        print(str(index + 1) + "순위")
-        print(*results[index], sep="\n")
-        count -= length
-    else:
-        print(str(index + 1) + "순위")
-        print(*results[index][:count], sep="\n")
-
-    return count
 
 
 def is_rastaurant(query):
@@ -133,6 +117,22 @@ def is_rastaurant(query):
     return results, check
 
 
+def print_result(count, results, index):
+    length = len(results[index])
+    if length == 0:
+        print(str(index + 1) + "순위 결과 없음")
+        pass
+    elif count - length > 0:
+        print(str(index + 1) + "순위")
+        print(*results[index], sep="\n")
+        count -= length
+    else:
+        print(str(index + 1) + "순위")
+        print(*results[index][:count], sep="\n")
+
+    return count
+
+
 def check_name(query):
     results, check = is_rastaurant(query)
     if check == -1:
@@ -148,7 +148,7 @@ def check_name(query):
         count = 6
         for i in range(2):
             count = print_result(count, results, i)
-        excepts.add(query)
+        # excepts.add(query)
         print()
     # print('='*20)
 
