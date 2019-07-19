@@ -11,6 +11,9 @@ hangul = re.compile("[^ 0-9가-힣]+")
 def kakao_log_to_nouns(sentence):
 
     names = set()  # 찾은 이름을 저장할 set
+    urls = re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', sentence)
+    for url in urls:
+        sentence = sentence.replace(url, "")
     line = hangul.sub(" ", sentence)
 
     # 1단계 : 띄어쓰기 기준

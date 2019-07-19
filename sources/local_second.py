@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import urllib.request
 import time
 import json
@@ -13,15 +15,18 @@ with open("../datas/category_list.txt", 'r') as file:
 except_file = "../datas/except_list.txt"
 excepts = set()
 
+검색결과수 = "30"
+검색시작위치 = "1"
 
-def search_local(검색어):
-    검색결과수 = "30"
-    검색시작위치 = "1"
+# client_id = "7Ph92HhYly6BfwHkncbM"
+# client_secret = "PWciOMPN_p"
 
-    client_id = "7Ph92HhYly6BfwHkncbM"
-    client_secret = "PWciOMPN_p"
+clinet_id = "6AkDMh30q3LjxKzZC2Oo"
+client_secret = "KghRTtlRZu"
 
-    검색어 = urllib.parse.quote(검색어)
+
+def search_local(query):
+    검색어 = urllib.parse.quote(query)
     url = "https://openapi.naver.com/v1/search/local"
     url += "?query=" + 검색어
     url += "&display=" + 검색결과수
@@ -40,7 +45,7 @@ def search_local(검색어):
         else:
             print("Error Code:" + rescode)
     except:
-        print("error : " + 검색어)
+        print("error : " + query)
         return False
 
 
@@ -63,7 +68,7 @@ def print_result(count, results, index):
 def is_rastaurant(query):
     respons_body = search_local(query)
     if not respons_body:  # 에러난 경우
-        return [], -1
+        return "", [], -1
 
     json_result = json.loads(respons_body)
 
@@ -72,6 +77,7 @@ def is_rastaurant(query):
     for item in json_result["items"]:
         title = item["title"]
         category = item["category"]
+        roadAddress = item["roadAddress"]
         if category.split('>')[0] in categories:
 
             bolds = []  # 검색어에 겹치는 단어들
@@ -126,11 +132,11 @@ def is_rastaurant(query):
     elif len(results[0]) + len(results[1]) == 0:
         check = 1
 
-    return results, check
+    return roadAddress, results, check
 
 
 def check_name(query):
-    results, check = is_rastaurant(query)
+    address, results, check = is_rastaurant(query)
     if check == -1:
         pass
     elif check == 0:
@@ -141,11 +147,7 @@ def check_name(query):
         # print("유사 결과만 있음")
         # print_result(5, results, i)
     elif check == 2:
-        count = 6
-        for i in range(3):
-            count = print_result(count, results, i)
-        excepts.add(query)
-        print()
+        print(query + " / " + address)
     # print('='*20)
 
 
