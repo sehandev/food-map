@@ -32,11 +32,11 @@ def text_export(text_name):
     data.columns = ['이름', '시간', '내용']
     data = data.set_index("이름")
 
-    data.to_csv('../datas/ADE_user.csv', encoding='euc-kr')
+    data.to_csv('../datas/', encoding='euc-kr')
 
 
 def main():
-    text_export("test.txt")
+    text_export("서울시 지하철역 정보 검색()")
 
 
 if __name__ == '__main__':
