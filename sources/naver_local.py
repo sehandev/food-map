@@ -3,11 +3,12 @@ import time
 import json
 import re
 import base64
+import sys
+import os
 from difflib import SequenceMatcher
+# from find_name import kakao_log_to_nouns
 
-from find_name import kakao_log_to_nouns
-
-with open("../datas/category_list.txt", 'r') as file:
+with open("./datas/category_list.txt", 'r') as file:
     categories = file.read().split('\n')
 
 # except_file = "../datas/except_list.txt"
@@ -16,24 +17,24 @@ with open("../datas/category_list.txt", 'r') as file:
 검색결과수 = "30"
 검색시작위치 = "1"
 
-# sehan
-# client_id = "7Ph92HhYly6BfwHkncbM"
-# client_secret = "PWciOMPN_p"
+client_information = [
+    ["7Ph92HhYly6BfwHkncbM", "PWciOMPN_p"],  # sehan
+    ["6AkDMh30q3LjxKzZC2Oo", "KghRTtlRZu"],  # maylily
+]
 
-# maylily
-client_id = "6AkDMh30q3LjxKzZC2Oo"
-client_secret = "KghRTtlRZu"
-
+client_index = 0
 
 def search_local(query):
+    global client_index
+
     검색어 = urllib.parse.quote(query)
     url = "https://openapi.naver.com/v1/search/local"
     url += "?query=" + 검색어
     url += "&display=" + 검색결과수
     url += "&start=" + 검색시작위치
     request = urllib.request.Request(url)
-    request.add_header("X-Naver-Client-Id", client_id)
-    request.add_header("X-Naver-Client-Secret", client_secret)
+    request.add_header("X-Naver-Client-Id", client_information[client_index][0])
+    request.add_header("X-Naver-Client-Secret", client_information[client_index][1])
     try:
         response = urllib.request.urlopen(request)
         rescode = response.getcode()
@@ -44,14 +45,21 @@ def search_local(query):
             return response_body
         else:
             print("Error Code:" + rescode)
+            return []
     except:
         print("error : " + query)
-        return False
+        if client_index < len(client_information) - 1:
+            # 대체할 계정이 남은 경우
+            client_index += 1
+            return search_local(query)
+        else:
+            # 보유한 계정을 다 사용한 경우
+            return -1
 
 
 def is_rastaurant(query):
     respons_body = search_local(query)
-    if not respons_body:  # 에러난 경우
+    if respons_body == -1:  # 에러난 경우
         return [], -1
 
     json_result = json.loads(respons_body)
@@ -107,12 +115,14 @@ def is_rastaurant(query):
     for i in range(len(results[2])):
         results[2][i] = results[2][i][0]
 
-    check = 2
+    check = 3
 
     if len(results[0]) + len(results[1]) + len(results[2]) == 0:
         check = 0
     elif len(results[0]) + len(results[1]) == 0:
         check = 1
+    elif len(results[0]) == 0:
+        check = 2
 
     return results, check
 
@@ -136,21 +146,31 @@ def print_result(count, results, index):
 def check_name(query):
     results, check = is_rastaurant(query)
     if check == -1:
-        pass
+        # 에러가 발생한 경우 : api 1일 할당량 초과
+        return -1
     elif check == 0:
-        pass
+        # 검색 결과 없는 경우 : 식당 이름이 아니라고 추측
+        return []
         # print("식당 이름이 아님")
     elif check == 1:
-        pass
-        # print("유사 결과만 있음")
+        # 유사 결과만 있는 경우
+        return []
         # print_result(5, results, i)
     elif check == 2:
-        count = 6
-        for i in range(2):
-            count = print_result(count, results, i)
-        # excepts.add(query)
-        print()
-    # print('='*20)
+        # 식당 이름인 경우 (1순위 없이 2순위만 있는 경우)
+        return results[1]
+    elif check == 3:
+        # 식당 이름인 경우
+        return results[:2]
+
+        # 1순위, 2순위, 3순위 출력
+        # count = 6
+        # for i in range(3):
+        #     count = print_result(count, results, i)
+    else:
+        # 알 수 없는 경우
+        print("비정상 check 발견")
+        return -1
 
 
 if __name__ == "__main__":
