@@ -9,7 +9,7 @@ from difflib import SequenceMatcher
 from sources import manage_file
 # from find_name import kakao_log_to_nouns
 
-categories = manage_file.read_file("/home/sehan/git/food-map/datas/category_list.txt")
+categories = manage_file.read_file_as_list("/home/sehan/git/food-map/datas/category_list.txt")
 
 # except_file = "../datas/except_list.txt"
 # excepts = set()
@@ -158,10 +158,10 @@ def check_name(query):
         # print_result(5, results, i)
     elif check == 2:
         # 식당 이름인 경우 (1순위 없이 2순위만 있는 경우)
-        return results[1]
+        return results
     elif check == 3:
         # 식당 이름인 경우
-        return results[:2]
+        return results
 
         # 1순위, 2순위, 3순위 출력
         # count = 6
