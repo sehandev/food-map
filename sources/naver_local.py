@@ -6,10 +6,10 @@ import base64
 import sys
 import os
 from difflib import SequenceMatcher
+from sources import manage_file
 # from find_name import kakao_log_to_nouns
 
-with open("./datas/category_list.txt", 'r') as file:
-    categories = file.read().split('\n')
+categories = manage_file.read_file("/home/sehan/git/food-map/datas/category_list.txt")
 
 # except_file = "../datas/except_list.txt"
 # excepts = set()
@@ -19,7 +19,7 @@ with open("./datas/category_list.txt", 'r') as file:
 
 client_information = [
     ["7Ph92HhYly6BfwHkncbM", "PWciOMPN_p"],  # sehan
-    ["6AkDMh30q3LjxKzZC2Oo", "KghRTtlRZu"],  # maylily
+    ["6AkDMh30q3LjxKzZC2Oo", "KghRTtlRZu"]  # maylily
 ]
 
 client_index = 0

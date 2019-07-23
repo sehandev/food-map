@@ -1,7 +1,8 @@
-def preprocessing(kakao_file):
-    with open(kakao_file, 'r') as file:
-        lines = file.read().split('\n')
+from sources import read_file
 
+def preprocessing(kakao_file):
+
+    lines = read_file.read_file(kakao_file)
     new_lines = []  # 새롭게 작성할 문서
     for line in lines[2:]:
 
@@ -105,7 +106,3 @@ def preprocessing(kakao_file):
     #             file.write(line[2].strip() + '\n')
 
     return processed_lines
-
-
-if __name__ == "__main__":
-    preprocessing("../datas/kakao.txt")

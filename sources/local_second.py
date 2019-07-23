@@ -9,10 +9,10 @@ from difflib import SequenceMatcher
 
 from find_name import kakao_log_to_nouns
 
-with open("../datas/category_list.txt", 'r') as file:
+with open("/home/sehan/git/food-map/datas/category_list.txt", 'r') as file:
     categories = file.read().split('\n')
 
-except_file = "../datas/except_list.txt"
+except_file = "/home/sehan/git/food-map/datas/except_list.txt"
 excepts = set()
 
 검색결과수 = "30"
