@@ -1,40 +1,41 @@
+# -*- coding: utf-8 -*-
+
 import urllib.request
 import time
 import json
 import re
 import base64
-import sys
-import os
 from difflib import SequenceMatcher
-from sources import manage_file
-# from find_name import kakao_log_to_nouns
 
-categories = manage_file.read_file_as_list("/home/sehan/git/food-map/datas/category_list.txt")
+from find_name import kakao_log_to_nouns
 
-# except_file = "../datas/except_list.txt"
-# excepts = set()
+with open("/home/sehan/git/food-map/datas/category_list.txt", 'r') as file:
+    categories = file.read().split('\n')
 
-검색결과수 = "10"
+except_file = "/home/sehan/git/food-map/datas/except_list.txt"
+excepts = set()
+
+검색결과수 = "30"
 검색시작위치 = "1"
 
-client_information = [
-    ["7Ph92HhYly6BfwHkncbM", "PWciOMPN_p"],  # sehan
-    ["6AkDMh30q3LjxKzZC2Oo", "KghRTtlRZu"]  # maylily
-]
+# sehan
+# client_id = "7Ph92HhYly6BfwHkncbM"
+# client_secret = "PWciOMPN_p"
 
-client_index = 0
+# maylily
+clinet_id = "6AkDMh30q3LjxKzZC2Oo"
+client_secret = "KghRTtlRZu"
+
 
 def search_local(query):
-    global client_index
-
     검색어 = urllib.parse.quote(query)
     url = "https://openapi.naver.com/v1/search/local"
     url += "?query=" + 검색어
     url += "&display=" + 검색결과수
     url += "&start=" + 검색시작위치
     request = urllib.request.Request(url)
-    request.add_header("X-Naver-Client-Id", client_information[client_index][0])
-    request.add_header("X-Naver-Client-Secret", client_information[client_index][1])
+    request.add_header("X-Naver-Client-Id", client_id)
+    request.add_header("X-Naver-Client-Secret", client_secret)
     try:
         response = urllib.request.urlopen(request)
         rescode = response.getcode()
@@ -45,23 +46,31 @@ def search_local(query):
             return response_body
         else:
             print("Error Code:" + rescode)
-            return []
-    except Exception as exception:
-        print("Exception : " + str(exception))
-        print("error query : " + query)
-        if client_index < len(client_information) - 1:
-            # 대체할 계정이 남은 경우
-            client_index += 1
-            return search_local(query)
-        else:
-            # 보유한 계정을 다 사용한 경우
-            return -1
+    except:
+        print("error : " + query)
+        return False
+
+
+def print_result(count, results, index):
+    length = len(results[index])
+    if length == 0:
+        # print(str(index + 1) + "순위 결과 없음")
+        pass
+    elif count - length > 0:
+        print(str(index + 1) + "순위")
+        print(*results[index], sep="\n")
+        count -= length
+    else:
+        print(str(index + 1) + "순위")
+        print(*results[index][:count], sep="\n")
+
+    return count
 
 
 def is_rastaurant(query):
     respons_body = search_local(query)
-    if respons_body == -1:  # 에러난 경우
-        return [], -1
+    if not respons_body:  # 에러난 경우
+        return "", [], -1
 
     json_result = json.loads(respons_body)
 
@@ -70,6 +79,7 @@ def is_rastaurant(query):
     for item in json_result["items"]:
         title = item["title"]
         category = item["category"]
+        roadAddress = item["roadAddress"]
         if category.split('>')[0] in categories:
 
             bolds = []  # 검색어에 겹치는 단어들
@@ -102,77 +112,45 @@ def is_rastaurant(query):
                 for left in lefts:
                     if left in tmp:
                         t = tmp.index(left)
-                results[1].append([{"title": origin_title, "category": category, "address": item["roadAddress"]}, t])
+                # results[1].append([{"title": origin_title, "category": category, "address": item["roadAddress"]}, t])
 
             # 3단계 : 유사 title
             else:
-                results[2].append([{"title": origin_title, "category": category, "address": item["roadAddress"]}, similar_score])
+                # results[2].append([{"title": origin_title, "category": category, "address": item["roadAddress"]}, similar_score])
+                pass
 
     results[1].sort(key=lambda x: x[1])
     for i in range(len(results[1])):
         results[1][i] = results[1][i][0]
 
-    results[2].sort(key=lambda x: x[1], reverse=True)
-    for i in range(len(results[2])):
-        results[2][i] = results[2][i][0]
+    # results[2].sort(key=lambda x: x[1], reverse=True)
+    # for i in range(len(results[2])):
+    #     results[2][i] = results[2][i][0]
 
-    check = 3
+    check = 2
 
     if len(results[0]) + len(results[1]) + len(results[2]) == 0:
         check = 0
     elif len(results[0]) + len(results[1]) == 0:
         check = 1
-    elif len(results[0]) == 0:
-        check = 2
 
-    return results, check
-
-
-def print_result(count, results, index):
-    length = len(results[index])
-    if length == 0:
-        print(str(index + 1) + "순위 결과 없음")
-        pass
-    elif count - length > 0:
-        print(str(index + 1) + "순위")
-        print(*results[index], sep="\n")
-        count -= length
-    else:
-        print(str(index + 1) + "순위")
-        print(*results[index][:count], sep="\n")
-
-    return count
+    return roadAddress, results, check
 
 
 def check_name(query):
-    results, check = is_rastaurant(query)
+    address, results, check = is_rastaurant(query)
     if check == -1:
-        # 에러가 발생한 경우 : api 1일 할당량 초과
-        return -1
+        pass
     elif check == 0:
-        # 검색 결과 없는 경우 : 식당 이름이 아니라고 추측
-        return []
+        pass
         # print("식당 이름이 아님")
     elif check == 1:
-        # 유사 결과만 있는 경우
-        return []
+        pass
+        # print("유사 결과만 있음")
         # print_result(5, results, i)
     elif check == 2:
-        # 식당 이름인 경우 (1순위 없이 2순위만 있는 경우)
-        # return results
-        return []
-    elif check == 3:
-        # 식당 이름인 경우
-        return results
-
-        # 1순위, 2순위, 3순위 출력
-        # count = 6
-        # for i in range(3):
-        #     count = print_result(count, results, i)
-    else:
-        # 알 수 없는 경우
-        print("비정상 check 발견")
-        return -1
+        print(query + " / " + address)
+    # print('='*20)
 
 
 if __name__ == "__main__":
@@ -184,6 +162,6 @@ if __name__ == "__main__":
             for name in names:
                 if len(name) > 2:
                     check_name(name)
-    # with open(except_file, 'w') as file:
-    #     for ex in excepts:
-    #         file.write(ex + '\n')
+    with open(except_file, 'w') as file:
+        for ex in excepts:
+            file.write(ex + '\n')

@@ -3,10 +3,13 @@
 import re
 import time
 from twkorean import TwitterKoreanProcessor
+from sources import manage_file
 
 processor = TwitterKoreanProcessor(normalization=False, stemming=False)
 hangul = re.compile("[^ 0-9가-힣]+")
 
+josa_file = "/home/sehan/git/food-map/datas/josa_list.txt"
+josa_list = manage_file.read_file_as_list(josa_file)
 
 def kakao_log_to_nouns(sentence):
 
@@ -37,7 +40,13 @@ def kakao_log_to_nouns(sentence):
             if token[1] != "Josa":
                 tmp += token[0]
 
-        names.add(tmp)
+        if tmp != "":
+            names.add(tmp)
+
+        # 제작된 조사 목록 기준
+        for josa in josa_list:
+            if word[-len(josa):] == josa:
+                names.add(word)
 
     return list(names)
 

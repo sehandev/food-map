@@ -1,7 +1,8 @@
-def preprocessing(kakao_file):
-    with open(kakao_file, 'r') as file:
-        lines = file.read().split('\n')
+from sources import manage_file
 
+def preprocessing(kakao_file):
+
+    lines = manage_file.read_file_as_list(kakao_file)
     new_lines = []  # 새롭게 작성할 문서
     for line in lines[2:]:
 
@@ -80,26 +81,28 @@ def preprocessing(kakao_file):
             file.write(line[1] + ' : ')
             file.write(line[2] + '\n')
 
-    with open(kakao_file[:-4] + "_processed_without_time.txt", 'w') as file:
+    with open(kakao_file[:-4] + "_log.txt", 'w') as file:
         for line in processed_lines:
-            file.write(line[1][1:] + ' : ')
             file.write(line[2] + '\n')
 
-    with open(kakao_file[:-4] + "_processed_only_question.txt", 'w') as file:
-        for line in processed_lines:
-            if line[2].count('?') > 0:
-                file.write(line[2].strip() + '\n')
+    # with open(kakao_file[:-4] + "_processed_without_time.txt", 'w') as file:
+    #     for line in processed_lines:
+    #         file.write(line[1][1:] + ' : ')
+    #         file.write(line[2] + '\n')
 
-    with open(kakao_file[:-4] + "_processed_not_question.txt", 'w') as file:
-        for line in processed_lines:
-            if line[2].count('?') == 0 and line[2].count('!') == 0:
-                file.write(line[2].strip() + '\n')
+    # with open(kakao_file[:-4] + "_processed_only_question.txt", 'w') as file:
+    #     for line in processed_lines:
+    #         if line[2].count('?') > 0:
+    #             file.write(line[2].strip() + '\n')
+    #
+    # with open(kakao_file[:-4] + "_processed_not_question.txt", 'w') as file:
+    #     for line in processed_lines:
+    #         if line[2].count('?') == 0 and line[2].count('!') == 0:
+    #             file.write(line[2].strip() + '\n')
+    #
+    # with open(kakao_file[:-4] + "_processed_only_exclamation.txt", 'w') as file:
+    #     for line in processed_lines:
+    #         if line[2].count('!') > 0:
+    #             file.write(line[2].strip() + '\n')
 
-    with open(kakao_file[:-4] + "_processed_only_exclamation.txt", 'w') as file:
-        for line in processed_lines:
-            if line[2].count('!') > 0:
-                file.write(line[2].strip() + '\n')
-
-
-if __name__ == "__main__":
-    preprocessing("../datas/kakao.txt")
+    return processed_lines
