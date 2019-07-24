@@ -36,7 +36,7 @@ def text_export(text_name):
 
 
 def main():
-    text_export("서울시 지하철역 정보 검색()")
+    text_export("답변_대화.txt")  # 카톡 대화 그대로 ex) 2019.12.12, sehan : 달의노래 좋아요.
 
 
 if __name__ == '__main__':

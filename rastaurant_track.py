@@ -1,6 +1,7 @@
 import json
 import pathlib
 import signal
+import time
 
 from sources import preprocessing, find_name, except_string, naver_local, manage_file
 
@@ -10,6 +11,8 @@ result_file = "/home/sehan/git/food-map/datas/result.json"
 
 
 def tracking():
+    t_time = time.time()  # 시작 시간
+
     processed_lines = preprocessing.preprocessing(kakao_file)  # [ [시간1, 이름1, 내용1], [시간2, 이름2, 내용2], ... ]
     result_dict = manage_file.read_json_as_dict(result_file)
 
@@ -24,12 +27,16 @@ def tracking():
                     return
                 elif results != []:
                     result_dict[name] = {"first": results[0], "second": results[1], "third": results[2]}
+
                     count += 1
 
                     if count % 10 == 0:
                         manage_file.save_list_as_file(already_file, except_string.get_already_list())
                         manage_file.save_dict_as_json(result_file, result_dict)
-                        print("count : " + str(count))
+                        print("count : " + str(count), end=" -> ")
+
+                        t_time = time.time() - t_time
+                        print('{:02d}:{:02d}'.format(int(t_time % 3600 // 60), int(t_time % 60)))
 
     manage_file.save_list_as_file(already_file, except_string.get_already_list())
     print("검색 완료")
