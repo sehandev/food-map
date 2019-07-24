@@ -14,7 +14,7 @@ categories = manage_file.read_file_as_list("/home/sehan/git/food-map/datas/categ
 # except_file = "../datas/except_list.txt"
 # excepts = set()
 
-검색결과수 = "30"
+검색결과수 = "10"
 검색시작위치 = "1"
 
 client_information = [
@@ -46,8 +46,9 @@ def search_local(query):
         else:
             print("Error Code:" + rescode)
             return []
-    except:
-        print("error : " + query)
+    except Exception as exception:
+        print("Exception : " + str(exception))
+        print("error query : " + query)
         if client_index < len(client_information) - 1:
             # 대체할 계정이 남은 경우
             client_index += 1
@@ -158,7 +159,8 @@ def check_name(query):
         # print_result(5, results, i)
     elif check == 2:
         # 식당 이름인 경우 (1순위 없이 2순위만 있는 경우)
-        return results
+        # return results
+        return []
     elif check == 3:
         # 식당 이름인 경우
         return results

@@ -13,20 +13,20 @@ unit_list = manage_file.read_file_as_list(unit_file)
 
 
 def except_string(query):
-    if len(query) < 3:  # 길이 3 미만
-        if query.isdigit():  # 숫자만 있으면
+    if len(query) > 2:  # 길이 3 이상
+        if not query.isdigit():  # 숫자만 있지 않으면
             # 숫자 + 단위면
             for unit in unit_list:
                 if query[-len(unit):] == unit:
                     if query[:-len(unit)].isdigit():
                         return True
 
-    if query in already_list:  # 이미 검색한 기록이 있으면
-        if query in except_list:  # 블랙리스트에 있으면
-            return True
+            if not query in except_list:  # 블랙리스트에 없으면
+                if not query in already_list:  # 이미 검색한 기록이 없으면
+                    already_list.append(query)  # 검색한 기록이 없으므로 추가
+                    return False
 
-    already_list.append(query)  # 검색한 기록이 없으므로 추가
-    return False
+    return True
 
 
 def get_already_list():

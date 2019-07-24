@@ -24,12 +24,12 @@ def tracking():
                     return
                 elif results != []:
                     result_dict[name] = {"first": results[0], "second": results[1], "third": results[2]}
+                    count += 1
 
-        count += 1
-        if count % 50 == 0:
-            manage_file.save_list_as_file(already_file, except_string.get_already_list())
-            manage_file.save_dict_as_json(result_file, result_dict)
-            print("count : " + str(count))
+                    if count % 10 == 0:
+                        manage_file.save_list_as_file(already_file, except_string.get_already_list())
+                        manage_file.save_dict_as_json(result_file, result_dict)
+                        print("count : " + str(count))
 
     manage_file.save_list_as_file(already_file, except_string.get_already_list())
     print("검색 완료")
