@@ -1,16 +1,32 @@
+import manage_file
+import check_word
+import compare_two_of_text
 from twkorean import TwitterKoreanProcessor
-processor = TwitterKoreanProcessor(normalization=False, stemming=False)
+processor = TwitterKoreanProcessor()
 
-with open("../datas/kakao_questions.txt", 'r') as file:
-    lines = file.read().split('\n')
-    lines = list(set(lines))
+first_file = "../datas/kakao_questions.txt"
+second_file = "../datas/kakao_questions.txt"
+first_list = manage_file.read_file_as_list(first_file)
+second_list = manage_file.read_file_as_list(second_file)
 
-lines.sort(key=len)
 
-with open("../datas/kakao_questions_dup_remove.txt", 'w') as file:
+def get_tokens(lines):
+    result_list = []
     for line in lines:
         tokens = processor.tokenize_to_strings(line)
-        if len(tokens) <= 30:
-            for token in tokens:
-                file.write(token.replace("$$", '') + ' ')
-            file.write('\n')
+        for token in tokens:
+            result_list.append(token)
+
+    return result_list
+
+
+def find_keywords():
+    tokens = get_tokens(first_list)
+    first_percent = check_word.count_word(tokens)
+    tokens = get_tokens(second_list)
+    second_percent = check_word.count_word(tokens)
+    compare_two_of_text.compare_between(first_percent, second_percent)
+
+
+if __name__ == "__main__":
+    find_keywords()

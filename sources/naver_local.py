@@ -40,7 +40,7 @@ def search_local(query):
         rescode = response.getcode()
         if(rescode == 200):
             response_body = response.read()
-            time.sleep(0.04)
+            time.sleep(0.05)
             # print(response_body.decode('utf-8'))
             return response_body
         else:

@@ -1,4 +1,4 @@
-from sources import manage_file
+from sources import manage_file, except_list_of_place
 
 except_file = "/home/sehan/git/food-map/datas/except_list_2.txt"
 josa_file = "/home/sehan/git/food-map/datas/josa_list.txt"
@@ -9,7 +9,9 @@ except_list = manage_file.read_file_as_list(except_file)
 josa_list = manage_file.read_file_as_list(josa_file)
 already_list = manage_file.read_file_as_list(already_file)
 unit_list = manage_file.read_file_as_list(unit_file)
+subway_station_list = except_list_of_place.except_place()
 
+except_list.extend(subway_station_list)
 
 
 def except_string(query):
