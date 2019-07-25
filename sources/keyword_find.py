@@ -20,7 +20,7 @@ def get_tokens(lines):
 
     return result_list
 
-def print_compare_result(compare_list):
+def save_compare_result(compare_list):
     with open(result_file, 'w') as file:
         for name, percent in compare_list:
             percent = round(percent, 2)
@@ -33,7 +33,7 @@ def find_keywords():
     tokens = get_tokens(second_list)
     second_percent = check_word.count_words(tokens)
     compare_list = compare_two_of_text.text_compare(first_percent, second_percent)
-    print_compare_result(compare_list)
+    save_compare_result(compare_list)
 
 if __name__ == "__main__":
     find_keywords()

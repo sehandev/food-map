@@ -1,13 +1,20 @@
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--track", help="tracking rastaurant name", action="store_true")
+parser.add_argument("--grade", help="grading questions", action="store_true")
+args = parser.parse_args()
+
 import json
 import pathlib
 import signal
 import time
-
-from sources import preprocessing, find_name, except_string, naver_local, manage_file
+from sources import preprocessing, find_name, except_string, naver_local, manage_file, is_question
 
 kakao_file = "/home/sehan/git/food-map/datas/kakao.txt"
 already_file = "/home/sehan/git/food-map/datas/already_list.txt"
 result_file = "/home/sehan/git/food-map/datas/result.json"
+
 
 
 def tracking():
@@ -41,6 +48,15 @@ def tracking():
     manage_file.save_list_as_file(already_file, except_string.get_already_list())
     print("검색 완료")
 
+def grade_question():
+    processed_lines = preprocessing.preprocessing(kakao_file)  # [ [시간1, 이름1, 내용1], [시간2, 이름2, 내용2], ... ]
+    for sentence in processed_lines:
+        score = is_question.grade(sentence)
+        print(str(score) + " : " + sentence)
+
 
 if __name__ == "__main__":
-    tracking()
+    if args.track:
+        track_name()
+    elif args.grade:
+        grade_question()
