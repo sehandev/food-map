@@ -4,7 +4,7 @@ import json
 
 def read_file_as_list(file_name):
     if pathlib.Path(file_name).exists():
-        with open(file_name, 'r') as file:
+        with open(file_name, 'r', encoding='utf-8-sig') as file:
             lines = file.read().split('\n')
         return lines
     else:
@@ -21,7 +21,7 @@ def save_list_as_file(file_name, list):
 
 def read_json_as_dict(file_name):
     if pathlib.Path(file_name).exists():
-        with open(file_name) as file:
+        with open(file_name, encoding='utf-8-sig') as file:
             dict = json.load(file)
         return dict
     else:
@@ -31,5 +31,5 @@ def read_json_as_dict(file_name):
 
 
 def save_dict_as_json(file_name, dict):
-    with open(file_name, 'w', encoding='utf8') as file:
+    with open(file_name, 'w', encoding='utf-8-sig') as file:
         json.dump(dict, file, ensure_ascii=False, indent=2)
