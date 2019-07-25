@@ -4,7 +4,7 @@ import compare_two_of_text
 from twkorean import TwitterKoreanProcessor
 processor = TwitterKoreanProcessor()
 
-first_file = "../datas/kakao_questions.txt"
+first_file = "../datas/samples/kakao_questions.txt"
 second_file = "../datas/kakao_log.txt"
 result_file = "../datas/compare_result.txt"
 first_list = manage_file.read_file_as_list(first_file)
