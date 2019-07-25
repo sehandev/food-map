@@ -1,3 +1,8 @@
+from sources import preprocessing, find_name, except_string, naver_local, manage_file, is_question
+import time
+import signal
+import pathlib
+import json
 import argparse
 
 parser = argparse.ArgumentParser()
@@ -5,16 +10,11 @@ parser.add_argument("--track", help="tracking rastaurant name", action="store_tr
 parser.add_argument("--grade", help="grading questions", action="store_true")
 args = parser.parse_args()
 
-import json
-import pathlib
-import signal
-import time
-from sources import preprocessing, find_name, except_string, naver_local, manage_file, is_question
 
 kakao_file = "/home/sehan/git/food-map/datas/kakao.txt"
 already_file = "/home/sehan/git/food-map/datas/already_list.txt"
 result_file = "/home/sehan/git/food-map/datas/result.json"
-
+question_file = "./datas/samples/kakao_questions_2.txt"
 
 
 def tracking():
@@ -48,11 +48,17 @@ def tracking():
     manage_file.save_list_as_file(already_file, except_string.get_already_list())
     print("검색 완료")
 
+
 def grade_question():
-    processed_lines = preprocessing.preprocessing(kakao_file)  # [ [시간1, 이름1, 내용1], [시간2, 이름2, 내용2], ... ]
-    for sentence in processed_lines:
+    # processed_lines = preprocessing.preprocessing(kakao_file)  # [ [시간1, 이름1, 내용1], [시간2, 이름2, 내용2], ... ]
+    processed_lines = preprocessing.preprocessing(question_file)  # [ [시간1, 이름1, 내용1], [시간2, 이름2, 내용2], ... ]
+    
+    score_result = []
+    for time, name, sentence in processed_lines:
         score = is_question.grade(sentence)
-        print(str(score) + " : " + sentence)
+        score_result.append([score, sentence])
+    score_result.sort(key=lambda x: x[0])
+    print(*score_result, sep='\n')
 
 
 if __name__ == "__main__":
