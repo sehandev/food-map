@@ -1,6 +1,6 @@
 
 import pandas as pd
-
+text_name = "../datas/aa"  #고쳐야함
 
 def parsing_word(line):  # 문장쪼개기(함수)
     first_divide = line.split(',', maxsplit=1)  # 시간 / 이름+내용 분리
@@ -12,7 +12,7 @@ def parsing_word(line):  # 문장쪼개기(함수)
     return word  # 정리된 형식으로 return
 
 
-def text_export(text_name):
+def text_export():
     user_data = []
     file = open(text_name, 'r', encoding='utf-8-sig')
     lines = file.read().split('\n')
@@ -32,11 +32,12 @@ def text_export(text_name):
     data.columns = ['이름', '시간', '내용']
     data = data.set_index("이름")
 
-    data.to_csv('../datas/', encoding='euc-kr')
+    data.to_csv('../datas/ADE_users', encoding='euc-kr')
 
 
 def main():
     text_export("답변_대화.txt")  # 카톡 대화 그대로 ex) 2019.12.12, sehan : 달의노래 좋아요.
+
 
 
 if __name__ == '__main__':

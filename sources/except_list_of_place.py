@@ -19,20 +19,8 @@ def except_place():
     return except_data
 
 
-def place_name_list():
-    info_key = '4284DB27-53C5-3C33-88E5-EDFA843DA586'
-    info_url = 'http://www.sehan.ml'
-    need_parameter = '[geomFilter]'
-    place_url = 'http://api.vworld.kr/req/data?service=data&request=GetFeature&data=LT_C_ADEMD_INFO&key='+ info_key +'&domain='+ info_url + '&' + need_parameter
-    response = requests.get(place_url)
-
-    place = response.text
-    print(place)
-
 def main():
     except_place()
-    place_name_list()
-
 
 if __name__ == '__main__':
     main()
