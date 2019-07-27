@@ -17,7 +17,7 @@ result_file = "./datas/result.json"
 question_file = "./datas/samples/kakao_questions_2.txt"
 
 
-def tracking():
+def track_name():
     t_time = time.time()  # 시작 시간
 
     processed_lines = preprocessing.preprocessing(kakao_file)  # [ [시간1, 이름1, 내용1], [시간2, 이름2, 내용2], ... ]
