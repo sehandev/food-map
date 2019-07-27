@@ -7,12 +7,8 @@ import sys
 import os
 from difflib import SequenceMatcher
 from sources import manage_file
-# from find_name import kakao_log_to_nouns
 
 categories = manage_file.read_file_as_list("/home/sehan/git/food-map/datas/category_list.txt")
-
-# except_file = "../datas/except_list.txt"
-# excepts = set()
 
 검색결과수 = "10"
 검색시작위치 = "1"
@@ -23,6 +19,7 @@ client_information = [
 ]
 
 client_index = 0
+
 
 def search_local(query):
     global client_index
@@ -41,7 +38,6 @@ def search_local(query):
         if(rescode == 200):
             response_body = response.read()
             time.sleep(0.05)
-            # print(response_body.decode('utf-8'))
             return response_body
         else:
             print("Error Code:" + rescode)
@@ -74,8 +70,8 @@ def is_rastaurant(query):
 
             bolds = []  # 검색어에 겹치는 단어들
             lefts = []  # 검색어에 겹치지 않는 단어들
-
             tmps = title.split("</b>")
+
             for tmp in tmps[-1].split():
                 if tmp != '':
                     lefts.append(tmp)
@@ -96,7 +92,6 @@ def is_rastaurant(query):
 
             # 2단계 : 동일 title + 다른 단어
             elif similar_score == 1.0 and len(lefts) > 0:
-
                 tmp = ["본점", "본관", "원조", "별관", "분점"]
                 t = len(tmp)
                 for left in lefts:
@@ -152,11 +147,9 @@ def check_name(query):
     elif check == 0:
         # 검색 결과 없는 경우 : 식당 이름이 아니라고 추측
         return []
-        # print("식당 이름이 아님")
     elif check == 1:
         # 유사 결과만 있는 경우
         return []
-        # print_result(5, results, i)
     elif check == 2:
         # 식당 이름인 경우 (1순위 없이 2순위만 있는 경우)
         # return results
@@ -173,17 +166,3 @@ def check_name(query):
         # 알 수 없는 경우
         print("비정상 check 발견")
         return -1
-
-
-if __name__ == "__main__":
-    with open("../datas/kakao_processed_only_log.txt", 'r') as file:
-        sentences = file.read().split('\n')
-        for sentence in sentences:
-            # print("카톡 내용 : " + sentence)
-            names = kakao_log_to_nouns(sentence)
-            for name in names:
-                if len(name) > 2:
-                    check_name(name)
-    # with open(except_file, 'w') as file:
-    #     for ex in excepts:
-    #         file.write(ex + '\n')
