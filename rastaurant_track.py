@@ -50,8 +50,8 @@ def tracking():
 
 
 def grade_question():
-    # processed_lines = preprocessing.preprocessing(kakao_file)  # [ [시간1, 이름1, 내용1], [시간2, 이름2, 내용2], ... ]
-    processed_lines = preprocessing.preprocessing(question_file)  # [ [시간1, 이름1, 내용1], [시간2, 이름2, 내용2], ... ]
+    processed_lines = preprocessing.preprocessing(kakao_file)  # [ [시간1, 이름1, 내용1], [시간2, 이름2, 내용2], ... ]
+    # processed_lines = preprocessing.preprocessing(question_file)  # [ [시간1, 이름1, 내용1], [시간2, 이름2, 내용2], ... ]
 
     score_result = []
     for time, name, sentence in processed_lines:

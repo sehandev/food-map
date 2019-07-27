@@ -11,6 +11,12 @@ def text_compare(question_list, not_question_list):
                 percent = question_list[i][1] - not_question_list[j][1]
                 word_percent = [question_list[i][0], percent]
                 compare_list.append(word_percent)
+                
+            elif question_list[i][0] != not_question_list[j][0]:
+                percent = question_list[i][1]
+                question_list[i][0] = question_list[i][0] + "only question"
+                word_percent = [question_list[i][0], percent]
+                compare_list.append(word_percent)
 
     compare_list.sort(key=itemgetter(1), reverse=True)
     return compare_list

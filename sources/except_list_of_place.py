@@ -1,7 +1,7 @@
 import requests
 
-
 except_subway_text_name = "/home/sehan/git/food-map/datas/subway_place_name.csv"
+
 
 def set_data(line):
     data_divide = line.split(',', maxsplit=3)
@@ -21,6 +21,7 @@ def except_place():
 
 def main():
     except_place()
+
 
 if __name__ == '__main__':
     main()
