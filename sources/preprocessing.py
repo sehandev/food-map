@@ -1,5 +1,5 @@
-# from sources import manage_file
-import manage_file
+from sources import manage_file
+# import manage_file
 
 def preprocessing(kakao_file):
 
@@ -76,15 +76,15 @@ def preprocessing(kakao_file):
                 pre_index = i
                 processed_lines.append(new_lines[i])
 
-    with open(kakao_file[:-4] + "_processed.txt", 'w') as file:
-        for line in processed_lines:
-            file.write(line[0] + ',')
-            file.write(line[1] + ' : ')
-            file.write(line[2] + '\n')
-
-    with open(kakao_file[:-4] + "_log.txt", 'w') as file:
-        for line in processed_lines:
-            file.write(line[2] + '\n')
+    # with open(kakao_file[:-4] + "_processed.txt", 'w') as file:
+    #     for line in processed_lines:
+    #         file.write(line[0] + ',')
+    #         file.write(line[1] + ' : ')
+    #         file.write(line[2] + '\n')
+    #
+    # with open(kakao_file[:-4] + "_log.txt", 'w') as file:
+    #     for line in processed_lines:
+    #         file.write(line[2] + '\n')
 
     # with open(kakao_file[:-4] + "_processed_without_time.txt", 'w') as file:
     #     for line in processed_lines:

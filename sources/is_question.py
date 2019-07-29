@@ -3,14 +3,17 @@ from sources import manage_file, except_list_of_place
 from twkorean import TwitterKoreanProcessor
 
 processor = TwitterKoreanProcessor()
-hangul = re.compile("[^ !?가-힣]+")
+hangul = re.compile("[^ !?0-9가-힣]+")
 
 keyword_file = "./datas/question_keywords.txt"
 rastaurant_file = "./datas/result.json"
+food_file = "./datas/food_list.txt"
+
 keyword_dict = manage_file.read_txt_as_dict(keyword_file)
 keyword_list = list(keyword_dict.keys())
 subway_list = except_list_of_place.except_place()
 rastuarant_list = manage_file.read_json_as_dict(rastaurant_file).keys()
+food_list = manage_file.read_file_as_list(food_file)
 
 
 def combine_tag(word):
@@ -37,6 +40,8 @@ def grade(line):
         line = line.replace(subway, "지역")
     for rastuarant in rastuarant_list:
         line = line.replace(rastuarant, "이름")
+    for food in food_list:
+        line = line.replace(food, "음식")
     tokens = get_tokens(line)
 
     if not '?' in tokens:
