@@ -13,7 +13,8 @@ args = parser.parse_args()
 
 kakao_file = "./datas/kakao.txt"
 already_file = "./datas/already_list.txt"
-result_file = "./datas/result.json"
+track_result_file = "./results/result.json"
+grade_result_file = "./results/grade.txt"
 question_file = "./datas/samples/kakao_questions_2.txt"
 
 
@@ -21,7 +22,7 @@ def track_name():
     t_time = time.time()  # 시작 시간
 
     processed_lines = preprocessing.preprocessing(kakao_file)  # [ [시간1, 이름1, 내용1], [시간2, 이름2, 내용2], ... ]
-    result_dict = manage_file.read_json_as_dict(result_file)
+    result_dict = manage_file.read_json_as_dict(track_result_file)
 
     count = 1
     for sentence in processed_lines:
@@ -39,7 +40,7 @@ def track_name():
 
                     if count % 10 == 0:
                         manage_file.save_list_as_file(already_file, except_string.get_already_list())
-                        manage_file.save_dict_as_json(result_file, result_dict)
+                        manage_file.save_dict_as_json(track_result_file, result_dict)
                         print("count : " + str(count), end=" -> ")
 
                         t_time = time.time() - t_time
@@ -50,15 +51,22 @@ def track_name():
 
 
 def grade_question():
-    processed_lines = preprocessing.preprocessing(kakao_file)  # [ [시간1, 이름1, 내용1], [시간2, 이름2, 내용2], ... ]
-    # processed_lines = preprocessing.preprocessing(question_file)  # [ [시간1, 이름1, 내용1], [시간2, 이름2, 내용2], ... ]
+    # processed_lines = preprocessing.preprocessing(kakao_file)  # [ [시간1, 이름1, 내용1], [시간2, 이름2, 내용2], ... ]
+    processed_lines = preprocessing.preprocessing(question_file)  # [ [시간1, 이름1, 내용1], [시간2, 이름2, 내용2], ... ]
 
     score_result = []
     for time, name, sentence in processed_lines:
-        score = is_question.grade(sentence)
-        score_result.append([score, sentence])
+        score, tokens = is_question.grade(sentence)
+        score_result.append([score, sentence, tokens])
     score_result.sort(key=lambda x: x[0])
-    print(*score_result, sep='\n')
+    with open(grade_result_file, 'w') as file:
+        for score, sentence, tokens in score_result:
+            file.write(str(score) + " : ")
+            file.write("{0:100}".format(sentence))
+            file.write("// ")
+            for token in tokens:
+                file.write(token + " ")
+            file.write('\n')
 
 
 if __name__ == "__main__":

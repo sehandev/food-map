@@ -4,7 +4,7 @@ import check_word
 import compare_two_of_text
 import except_list_of_place
 import re
-hangul = re.compile("[^ !?가-힣]+")
+hangul = re.compile("[^ 가-힣]+")
 processor = TwitterKoreanProcessor()
 
 first_file = "../datas/samples/kakao_questions.txt"
@@ -39,12 +39,12 @@ def save_compare_result(compare_list, only_question_list):
         for name, percent in compare_list:
             percent = round(percent, 2)
             file.write(name + " " + str(percent) + '\n')
-        
+
     with open(result_file2, 'w') as file:
         for name, percent in only_question_list:
             percent = round(percent, 2)
-            file.write(name + " " + str(percent) + '\n')        
-    
+            file.write(name + " " + str(percent) + '\n')
+
 
 
 def find_keywords():
