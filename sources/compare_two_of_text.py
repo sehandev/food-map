@@ -21,7 +21,7 @@ def text_compare(question_list, not_question_list):
 
     compare_list.sort(key=itemgetter(1), reverse=True)
     only_question_list.sort(key=itemgetter(1), reverse=True)
-        
+
     return compare_list, only_question_list
 
 

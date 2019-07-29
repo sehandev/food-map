@@ -1,4 +1,5 @@
-from sources import manage_file
+# from sources import manage_file
+import manage_file
 
 def preprocessing(kakao_file):
 

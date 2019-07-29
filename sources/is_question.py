@@ -8,7 +8,7 @@ hangul = re.compile("[^ !?가-힣]+")
 keyword_file = "./datas/question_keywords.txt"
 rastaurant_file = "./datas/result.json"
 keyword_dict = manage_file.read_txt_as_dict(keyword_file)
-keyword_list = keyword_dict.keys()
+keyword_list = list(keyword_dict.keys())
 subway_list = except_list_of_place.except_place()
 rastuarant_list = manage_file.read_json_as_dict(rastaurant_file).keys()
 
@@ -42,9 +42,15 @@ def grade(line):
     if not '?' in tokens:
         score = -1
     else:
+        already_check = [0 for i in range(len(keyword_list))]
         for token in tokens:
-            if token in keyword_list:
-                score += float(keyword_dict[token])
+            for i in range(len(keyword_list)):
+                if token == keyword_list[i]:
+                    already_check[i] = float(keyword_dict[token])
+
+        for check in already_check:
+            if check > 0:
+                score += check
                 count += 1
 
         if count > 1:
@@ -53,4 +59,4 @@ def grade(line):
         else:
             score = 0
 
-    return score
+    return score, tokens
