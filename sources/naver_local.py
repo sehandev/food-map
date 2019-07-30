@@ -8,7 +8,7 @@ import os
 from difflib import SequenceMatcher
 from sources import manage_file
 
-categories = manage_file.read_file_as_list("/home/sehan/git/food-map/datas/category_list.txt")
+categories = manage_file.read_file_as_list("./datas/category_list.txt")
 
 검색결과수 = "10"
 검색시작위치 = "1"
@@ -66,6 +66,7 @@ def is_rastaurant(query):
     for item in json_result["items"]:
         title = item["title"]
         category = item["category"]
+        road_address = item["roadAddress"]
         if category.split('>')[0] in categories:
 
             bolds = []  # 검색어에 겹치는 단어들
@@ -88,7 +89,7 @@ def is_rastaurant(query):
 
             # 1단계 : query(검색어)와 동일한 title
             if similar_score == 1.0 and len(lefts) == 0:  # 검색어만 있을 때
-                results[0].append({"title": origin_title, "category": category, "address": item["roadAddress"]})
+                results[0].append({"title": origin_title, "category": category, "address": road_address})
 
             # 2단계 : 동일 title + 다른 단어
             elif similar_score == 1.0 and len(lefts) > 0:
@@ -97,11 +98,11 @@ def is_rastaurant(query):
                 for left in lefts:
                     if left in tmp:
                         t = tmp.index(left)
-                results[1].append([{"title": origin_title, "category": category, "address": item["roadAddress"]}, t])
+                results[1].append([{"title": origin_title, "category": category, "address": road_address}, t])
 
             # 3단계 : 유사 title
             else:
-                results[2].append([{"title": origin_title, "category": category, "address": item["roadAddress"]}, similar_score])
+                results[2].append([{"title": origin_title, "category": category, "address": road_address}, similar_score])
 
     results[1].sort(key=lambda x: x[1])
     for i in range(len(results[1])):

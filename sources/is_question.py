@@ -6,7 +6,7 @@ processor = TwitterKoreanProcessor()
 hangul = re.compile("[^ !?0-9가-힣]+")
 
 keyword_file = "./datas/question_keywords.txt"
-rastaurant_file = "./datas/result.json"
+rastaurant_file = "./datas/rastaurant.json"
 food_file = "./datas/food_list.txt"
 
 keyword_dict = manage_file.read_txt_as_dict(keyword_file)

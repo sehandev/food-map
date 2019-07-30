@@ -8,7 +8,7 @@ from sources import manage_file
 processor = TwitterKoreanProcessor(normalization=False, stemming=False)
 hangul = re.compile("[^ 0-9가-힣]+")
 
-josa_file = "/home/sehan/git/food-map/datas/josa_list.txt"
+josa_file = "./datas/josa_list.txt"
 josa_list = manage_file.read_file_as_list(josa_file)
 
 def kakao_log_to_nouns(sentence):

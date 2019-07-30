@@ -12,12 +12,12 @@ parser.add_argument("--match", help="find match of question and answer", action=
 args = parser.parse_args()
 
 
-kakao_file = "./datas/kakao.txt"
+# kakao_file = "./datas/kakao.txt"
+kakao_file = "./datas/ADE_test_2.txt"
 already_file = "./datas/already_list.txt"
-track_result_file = "./results/result.json"
+track_result_file = "./results/rastaurant.json"
 grade_result_file = "./results/grade.txt"
 match_result_file = "./results/match.txt"
-question_file = "./datas/samples/kakao_questions_2.txt"
 
 
 def track_name():
@@ -53,8 +53,7 @@ def track_name():
 
 
 def grade_question():
-    # processed_lines = preprocessing.preprocessing(kakao_file)  # [ [시간1, 이름1, 내용1], [시간2, 이름2, 내용2], ... ]
-    processed_lines = preprocessing.preprocessing(question_file)  # [ [시간1, 이름1, 내용1], [시간2, 이름2, 내용2], ... ]
+    processed_lines = preprocessing.preprocessing(kakao_file)  # [ [시간1, 이름1, 내용1], [시간2, 이름2, 내용2], ... ]
 
     score_result = []
     for time, name, sentence in processed_lines:

@@ -1,9 +1,9 @@
 from sources import manage_file, except_list_of_place
 
-except_file = "/home/sehan/git/food-map/datas/except_list_2.txt"
-josa_file = "/home/sehan/git/food-map/datas/josa_list.txt"
-already_file = "/home/sehan/git/food-map/datas/already_list.txt"
-unit_file = "/home/sehan/git/food-map/datas/unit_list.txt"
+except_file = "./datas/except_list_2.txt"
+josa_file = "./datas/josa_list.txt"
+already_file = "./datas/already_list.txt"
+unit_file = "./datas/unit_list.txt"
 
 except_list = manage_file.read_file_as_list(except_file)
 josa_list = manage_file.read_file_as_list(josa_file)
