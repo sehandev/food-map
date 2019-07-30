@@ -55,11 +55,11 @@ def search_local(query):
 
 
 def is_rastaurant(query):
-    respons_body = search_local(query)
-    if respons_body == -1:  # 에러난 경우
+    response_body = search_local(query)
+    if response_body == -1:  # 에러난 경우
         return [], -1
 
-    json_result = json.loads(respons_body)
+    json_result = json.loads(response_body)
 
     results = [[] for _ in range(3)]
 
