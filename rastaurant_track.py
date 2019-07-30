@@ -8,6 +8,7 @@ import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("--track", help="tracking rastaurant name", action="store_true")
 parser.add_argument("--grade", help="grading questions", action="store_true")
+parser.add_argument("--match", help="find match of question and answer", action="store_true")
 args = parser.parse_args()
 
 
@@ -15,6 +16,7 @@ kakao_file = "./datas/kakao.txt"
 already_file = "./datas/already_list.txt"
 track_result_file = "./results/result.json"
 grade_result_file = "./results/grade.txt"
+match_result_file = "./results/match.txt"
 question_file = "./datas/samples/kakao_questions_2.txt"
 
 
@@ -68,9 +70,60 @@ def grade_question():
                 file.write(token + " ")
             file.write('\n')
 
+def find_match():
+    processed_lines = preprocessing.preprocessing(kakao_file)
+    already_list = except_string.get_already_list()
+    result_dict = manage_file.read_json_as_dict(track_result_file)
+
+    match_list = []
+    count = 1
+    finish_count = len(processed_lines)
+
+    for time, name, sentence in processed_lines:
+        # 질문 찾기
+        score, tokens = is_question.grade(sentence)
+        if score < 0.55:
+            # 점수 미달
+            pass
+        elif 0.55 <= score < 0.65:
+            # 수동 선택
+            match_list.append(['Q', sentence, score])
+        elif 0.65 <= score:
+            # 자동 선택
+            match_list.append(['QQ', sentence, score])
+
+        # 답변 찾기
+        names = find_name.kakao_log_to_nouns(sentence)
+        for name in names:
+            if name in already_list:
+                results = result_dict[name]
+            elif not except_string.except_string(name):
+                results = naver_local.check_name(name)
+                if results == -1:
+                    print("네이버 지역 검색 API 할당량을 초과했습니다")
+                    return
+            if results != []:
+                if len(results[0]) > 0:
+                    match_list.append(['A', sentence, results[0][0]['title']])
+                elif len(results[1]) > 0:
+                    match_list.append(['A', sentence, results[1][0]['title']])
+                else:
+                    # 유사 결과만 있음
+                    pass
+
+        # 진행 출력
+        if count % 100 == 0:
+            print("{0:5} / {1:5}".format(count, finish_count))
+        count += 1
+
+    # 결과 출력
+    manage_file.save_list_as_file(match_result_file, match_list)
+
 
 if __name__ == "__main__":
     if args.track:
         track_name()
     elif args.grade:
         grade_question()
+    elif args.match:
+        find_match()

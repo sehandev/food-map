@@ -16,7 +16,7 @@ def read_file_as_list(file_name):
 def save_list_as_file(file_name, list):
     with open(file_name, 'w') as file:
         for element in list:
-            file.write(element + '\n')
+            file.write(str(element) + '\n')
 
 
 def read_json_as_dict(file_name):
