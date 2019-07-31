@@ -1,3 +1,4 @@
 __pycache__/
-datas/result.json
+results/result.json
+results/match.txt
 datas/already_list.txt

@@ -6,7 +6,7 @@ processor = TwitterKoreanProcessor()
 hangul = re.compile("[^ !?0-9가-힣]+")
 
 keyword_file = "./datas/question_keywords.txt"
-rastaurant_file = "./datas/rastaurant.json"
+rastaurant_file = "./results/rastaurant.json"
 food_file = "./datas/food_list.txt"
 
 keyword_dict = manage_file.read_txt_as_dict(keyword_file)
@@ -44,24 +44,24 @@ def grade(line):
         line = line.replace(food, "음식")
     tokens = get_tokens(line)
 
-    if not '?' in tokens:
-        score = -1
+    # if not '?' in tokens:
+    #     score = -1
+    # else:
+    already_check = [0 for i in range(len(keyword_list))]
+    for token in tokens:
+        for i in range(len(keyword_list)):
+            if token == keyword_list[i]:
+                already_check[i] = float(keyword_dict[token])
+
+    for check in already_check:
+        if check > 0:
+            score += check
+            count += 1
+
+    if count > 1:
+        score /= len(tokens)
+        score = round(score, 2)
     else:
-        already_check = [0 for i in range(len(keyword_list))]
-        for token in tokens:
-            for i in range(len(keyword_list)):
-                if token == keyword_list[i]:
-                    already_check[i] = float(keyword_dict[token])
-
-        for check in already_check:
-            if check > 0:
-                score += check
-                count += 1
-
-        if count > 1:
-            score /= len(tokens)
-            score = round(score, 2)
-        else:
-            score = 0
+        score = 0
 
     return score, tokens

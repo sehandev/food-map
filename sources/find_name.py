@@ -46,7 +46,7 @@ def kakao_log_to_nouns(sentence):
         # 제작된 조사 목록 기준
         for josa in josa_list:
             if word[-len(josa):] == josa:
-                names.add(word)
+                names.add(word[:-len(josa)])
 
     return list(names)
 

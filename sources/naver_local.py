@@ -64,7 +64,7 @@ def is_rastaurant(query):
     results = [[] for _ in range(3)]
 
     for item in json_result["items"]:
-        title = item["title"]
+        title = item["title"].replace(" ", "")
         category = item["category"]
         road_address = item["roadAddress"]
         if category.split('>')[0] in categories:
@@ -83,7 +83,7 @@ def is_rastaurant(query):
                     lefts.append(t[0])
                 bolds.append(t[1])
 
-            new_title = ' '.join(bolds)
+            new_title = ''.join(bolds)
             similar_score = SequenceMatcher(None, query, new_title).ratio()
             origin_title = title.replace("<b>", "").replace("</b>", "")
 
@@ -94,10 +94,12 @@ def is_rastaurant(query):
             # 2단계 : 동일 title + 다른 단어
             elif similar_score == 1.0 and len(lefts) > 0:
                 tmp = ["본점", "본관", "원조", "별관", "분점"]
-                t = len(tmp)
+                # t = len(tmp)
+                t = 5
                 for left in lefts:
                     if left in tmp:
                         t = tmp.index(left)
+                        break
                 results[1].append([{"title": origin_title, "category": category, "address": road_address}, t])
 
             # 3단계 : 유사 title
@@ -153,8 +155,8 @@ def check_name(query):
         return []
     elif check == 2:
         # 식당 이름인 경우 (1순위 없이 2순위만 있는 경우)
-        # return results
-        return []
+        return results
+        # return []
     elif check == 3:
         # 식당 이름인 경우
         return results

@@ -36,7 +36,7 @@ def track_name():
                     print("네이버 지역 검색 API 할당량을 초과했습니다")
                     return
                 elif results != []:
-                    result_dict[name] = {"first": results[0], "second": results[1], "third": results[2]}
+                    result_dict[name] = results
 
                     count += 1
 
@@ -48,8 +48,10 @@ def track_name():
                         t_time = time.time() - t_time
                         print('{:02d}:{:02d}'.format(int(t_time % 3600 // 60), int(t_time % 60)))
 
+
     manage_file.save_list_as_file(already_file, except_string.get_already_list())
     print("검색 완료")
+    return processed_lines
 
 
 def grade_question():
@@ -70,9 +72,10 @@ def grade_question():
             file.write('\n')
 
 def find_match():
-    processed_lines = preprocessing.preprocessing(kakao_file)
-    already_list = except_string.get_already_list()
-    result_dict = manage_file.read_json_as_dict(track_result_file)
+    print("trace_name function")
+    processed_lines = track_name()
+    rastaurant_dict = manage_file.read_json_as_dict(track_result_file)
+    rastaurant_list = rastaurant_dict.keys()
 
     match_list = []
     count = 1
@@ -81,34 +84,40 @@ def find_match():
     for time, name, sentence in processed_lines:
         # 질문 찾기
         score, tokens = is_question.grade(sentence)
-        if score < 0.55:
-            # 점수 미달
-            pass
+        if 0.65 <= score:
+            # 자동 선택
+            match_list.append(['QQ', sentence, score])
         elif 0.55 <= score < 0.65:
             # 수동 선택
             match_list.append(['Q', sentence, score])
-        elif 0.65 <= score:
-            # 자동 선택
-            match_list.append(['QQ', sentence, score])
+        elif score < 0.55:
+            # 점수 미달
 
-        # 답변 찾기
-        names = find_name.kakao_log_to_nouns(sentence)
-        for name in names:
-            if name in already_list:
-                results = result_dict[name]
-            elif not except_string.except_string(name):
-                results = naver_local.check_name(name)
-                if results == -1:
-                    print("네이버 지역 검색 API 할당량을 초과했습니다")
-                    return
-            if results != []:
-                if len(results[0]) > 0:
-                    match_list.append(['A', sentence, results[0][0]['title']])
-                elif len(results[1]) > 0:
-                    match_list.append(['A', sentence, results[1][0]['title']])
+            # 답변 찾기
+            names = find_name.kakao_log_to_nouns(sentence)
+            if sentence.count("샵검색") > 0:
+                names.append(sentence.split("샵검색: #")[-1].replace(" ", ""))
+
+            not_answer = 1
+            for name in names:
+                if name in rastaurant_list:
+                    results = rastaurant_dict[name]
                 else:
-                    # 유사 결과만 있음
-                    pass
+                    results = []
+
+                if results != []:
+                    if len(results[0]) > 0:
+                        match_list.append(['A', sentence, results[0][0]['title']])
+                        not_answer = 0
+                    elif len(results[1]) > 0:
+                        match_list.append(['A', sentence, results[1][0]['title']])
+                        not_answer = 0
+                    else:
+                        # 유사 결과만 있음
+                        pass
+
+            if not_answer:
+                match_list.append(['N', sentence])
 
         # 진행 출력
         if count % 100 == 0:
