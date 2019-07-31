@@ -54,7 +54,7 @@ def search_local(query):
             return -1
 
 
-def is_rastaurant(query):
+def is_restaurant(query):
     response_body = search_local(query)
     if response_body == -1:  # 에러난 경우
         return [], -1
@@ -143,7 +143,7 @@ def print_result(count, results, index):
 
 
 def check_name(query):
-    results, check = is_rastaurant(query)
+    results, check = is_restaurant(query)
     if check == -1:
         # 에러가 발생한 경우 : api 1일 할당량 초과
         return -1

@@ -6,7 +6,7 @@ import json
 import argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--track", help="tracking rastaurant name", action="store_true")
+parser.add_argument("--track", help="tracking restaurant name", action="store_true")
 parser.add_argument("--grade", help="grading questions", action="store_true")
 parser.add_argument("--match", help="find match of question and answer", action="store_true")
 args = parser.parse_args()
@@ -15,7 +15,7 @@ args = parser.parse_args()
 # kakao_file = "./datas/kakao.txt"
 kakao_file = "./datas/ADE_test_2.txt"
 already_file = "./datas/already_list.txt"
-track_result_file = "./results/rastaurant.json"
+track_result_file = "./results/restaurant.json"
 grade_result_file = "./results/grade.txt"
 match_result_file = "./results/match.txt"
 
@@ -74,8 +74,8 @@ def grade_question():
 def find_match():
     print("trace_name function")
     processed_lines = track_name()
-    rastaurant_dict = manage_file.read_json_as_dict(track_result_file)
-    rastaurant_list = rastaurant_dict.keys()
+    restaurant_dict = manage_file.read_json_as_dict(track_result_file)
+    restaurant_list = restaurant_dict.keys()
 
     match_list = []
     count = 1
@@ -98,10 +98,12 @@ def find_match():
             if sentence.count("샵검색") > 0:
                 names.append(sentence.split("샵검색: #")[-1].replace(" ", ""))
 
+            # names = ["합정에", "괜찮은", "참치집", "있을까요", "있다"]
+
             not_answer = 1
             for name in names:
-                if name in rastaurant_list:
-                    results = rastaurant_dict[name]
+                if name in restaurant_list:
+                    results = restaurant_dict[name]
                 else:
                     results = []
 

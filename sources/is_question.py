@@ -6,13 +6,13 @@ processor = TwitterKoreanProcessor()
 hangul = re.compile("[^ !?0-9가-힣]+")
 
 keyword_file = "./datas/question_keywords.txt"
-rastaurant_file = "./results/rastaurant.json"
+restaurant_file = "./results/restaurant.json"
 food_file = "./datas/food_list.txt"
 
 keyword_dict = manage_file.read_txt_as_dict(keyword_file)
 keyword_list = list(keyword_dict.keys())
 subway_list = except_list_of_place.except_place()
-rastuarant_list = manage_file.read_json_as_dict(rastaurant_file).keys()
+rastuarant_list = manage_file.read_json_as_dict(restaurant_file).keys()
 food_list = manage_file.read_file_as_list(food_file)
 
 
