@@ -8,7 +8,7 @@ import os
 from difflib import SequenceMatcher
 from sources import manage_file
 
-categories = manage_file.read_file_as_list("/home/sehan/git/food-map/datas/category_list.txt")
+categories = manage_file.read_file_as_list("./datas/category_list.txt")
 
 검색결과수 = "10"
 검색시작위치 = "1"
@@ -54,18 +54,19 @@ def search_local(query):
             return -1
 
 
-def is_rastaurant(query):
-    respons_body = search_local(query)
-    if respons_body == -1:  # 에러난 경우
+def is_restaurant(query):
+    response_body = search_local(query)
+    if response_body == -1:  # 에러난 경우
         return [], -1
 
-    json_result = json.loads(respons_body)
+    json_result = json.loads(response_body)
 
     results = [[] for _ in range(3)]
 
     for item in json_result["items"]:
-        title = item["title"]
+        title = item["title"].replace(" ", "")
         category = item["category"]
+        road_address = item["roadAddress"]
         if category.split('>')[0] in categories:
 
             bolds = []  # 검색어에 겹치는 단어들
@@ -82,26 +83,28 @@ def is_rastaurant(query):
                     lefts.append(t[0])
                 bolds.append(t[1])
 
-            new_title = ' '.join(bolds)
+            new_title = ''.join(bolds)
             similar_score = SequenceMatcher(None, query, new_title).ratio()
             origin_title = title.replace("<b>", "").replace("</b>", "")
 
             # 1단계 : query(검색어)와 동일한 title
             if similar_score == 1.0 and len(lefts) == 0:  # 검색어만 있을 때
-                results[0].append({"title": origin_title, "category": category, "address": item["roadAddress"]})
+                results[0].append({"title": origin_title, "category": category, "address": road_address})
 
             # 2단계 : 동일 title + 다른 단어
             elif similar_score == 1.0 and len(lefts) > 0:
                 tmp = ["본점", "본관", "원조", "별관", "분점"]
-                t = len(tmp)
+                # t = len(tmp)
+                t = 5
                 for left in lefts:
                     if left in tmp:
                         t = tmp.index(left)
-                results[1].append([{"title": origin_title, "category": category, "address": item["roadAddress"]}, t])
+                        break
+                results[1].append([{"title": origin_title, "category": category, "address": road_address}, t])
 
             # 3단계 : 유사 title
             else:
-                results[2].append([{"title": origin_title, "category": category, "address": item["roadAddress"]}, similar_score])
+                results[2].append([{"title": origin_title, "category": category, "address": road_address}, similar_score])
 
     results[1].sort(key=lambda x: x[1])
     for i in range(len(results[1])):
@@ -140,7 +143,7 @@ def print_result(count, results, index):
 
 
 def check_name(query):
-    results, check = is_rastaurant(query)
+    results, check = is_restaurant(query)
     if check == -1:
         # 에러가 발생한 경우 : api 1일 할당량 초과
         return -1
@@ -152,8 +155,8 @@ def check_name(query):
         return []
     elif check == 2:
         # 식당 이름인 경우 (1순위 없이 2순위만 있는 경우)
-        # return results
-        return []
+        return results
+        # return []
     elif check == 3:
         # 식당 이름인 경우
         return results

@@ -1,6 +1,6 @@
 import requests
 
-except_subway_text_name = "/home/sehan/git/food-map/datas/subway_place_name.csv"
+except_subway_text_name = "./datas/subway_place_name.csv"
 
 
 def set_data(line):

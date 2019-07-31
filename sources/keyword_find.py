@@ -12,11 +12,11 @@ second_file = "../datas/kakao_log_left.txt"
 # second_file = "../datas/unit_list.txt"
 result_file1 = "../datas/compare_result.txt"
 result_file2 = "../datas/only_question_result.txt"
-rastaurant_file = "../datas/result.json"
+restaurant_file = "../datas/result.json"
 first_list = manage_file.read_file_as_list(first_file)
 second_list = manage_file.read_file_as_list(second_file)
 subway_list = except_list_of_place.except_place()
-rastuarant_list = manage_file.read_json_as_dict(rastaurant_file).keys()
+rastuarant_list = manage_file.read_json_as_dict(restaurant_file).keys()
 
 
 def get_tokens(lines):
