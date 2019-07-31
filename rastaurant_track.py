@@ -56,8 +56,10 @@ def grade_question():
 
     score_result = []
     for time, name, sentence in processed_lines:
-        score, tokens = is_question.grade(sentence)
-        score_result.append([score, sentence, tokens])
+        sentences = sentence.replace('!', '?').replace('??','?').split('?')
+        for sentence in sentences[:-1]:
+            score, tokens = is_question.grade(sentence)
+            score_result.append([score, sentence, tokens])
     score_result.sort(key=lambda x: x[0])
     with open(grade_result_file, 'w') as file:
         for score, sentence, tokens in score_result:
