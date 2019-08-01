@@ -50,8 +50,9 @@ def track_name():
 
 
     manage_file.save_list_as_file(already_file, except_string.get_already_list())
+    manage_file.save_dict_as_json(track_result_file, result_dict)
     print("검색 완료")
-    return processed_lines
+    return processed_lines, result_dict
 
 
 def grade_question():
@@ -73,8 +74,7 @@ def grade_question():
 
 def find_match():
     print("trace_name function")
-    processed_lines = track_name()
-    restaurant_dict = manage_file.read_json_as_dict(track_result_file)
+    processed_lines, restaurant_dict = track_name()
     restaurant_list = restaurant_dict.keys()
 
     match_list = []
