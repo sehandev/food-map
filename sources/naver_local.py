@@ -54,7 +54,7 @@ def search_local(query):
             return -1
 
 
-def is_restaurant(query):
+def is_restaurant(query, pivot):
     response_body = search_local(query)
     if response_body == -1:  # 에러난 경우
         return [], -1
@@ -84,7 +84,7 @@ def is_restaurant(query):
                 bolds.append(t[1])
 
             new_title = ''.join(bolds)
-            similar_score = SequenceMatcher(None, query, new_title).ratio()
+            similar_score = SequenceMatcher(None, pivot, new_title).ratio()
             origin_title = title.replace("<b>", "").replace("</b>", "")
 
             # 1단계 : query(검색어)와 동일한 title
@@ -142,8 +142,8 @@ def print_result(count, results, index):
     return count
 
 
-def check_name(query):
-    results, check = is_restaurant(query)
+def check_name(query, pivot):
+    results, check = is_restaurant(query, pivot)
     if check == -1:
         # 에러가 발생한 경우 : api 1일 할당량 초과
         return -1
