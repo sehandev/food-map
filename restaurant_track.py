@@ -13,7 +13,8 @@ args = parser.parse_args()
 
 
 # kakao_file = "./datas/kakao.txt"
-kakao_file = "./datas/ADE_test_2.txt"
+# kakao_file = "./datas/ADE_test_2.txt"
+kakao_file = "./datas/ADE_test_3.txt"
 already_file = "./datas/already_list.txt"
 track_result_file = "./results/restaurant.json"
 grade_result_file = "./results/grade.txt"
@@ -109,15 +110,19 @@ def find_match():
 
                 if results != []:
                     if len(results[0]) > 0:
-                        match_list.append(['A', sentence, results[0][0]['title']])
-                        not_answer = 0
+                        matchs_list = station_find(0, "공덕", name, sentence, results)
+                        match_list.append(matchs_list)
+                        not_answer = 0                    
+                        
                     elif len(results[1]) > 0:
-                        match_list.append(['A', sentence, results[1][0]['title']])
+                        matchs_list = station_find(1, "공덕", name, sentence, results)
+                        print(matchs_list)
+                        print("?")
+                        match_list.append(matchs_list)
                         not_answer = 0
                     else:
                         # 유사 결과만 있음
                         pass
-
             if not_answer:
                 match_list.append(['N', sentence])
 
@@ -129,6 +134,33 @@ def find_match():
     # 결과 출력
     manage_file.save_list_as_file(match_result_file, match_list)
 
+
+def station_find(score_number, station_name, name, sentence, results):
+    if station_name in sentence :
+        anothername = station_name + " " + name 
+        print(anothername)
+        station_result = naver_local.check_name(anothername)
+        namelist = []
+        matchs_list = []
+        for i in range(0, len(results[0])):
+            namelist.append(results[0][i]['title'])
+        
+        print("여기가 station_result")
+        print(station_result)
+        if station_result == []:
+            # 넘어가고 원래 결과 그대로 사용
+            matchs_list = (['A', sentence, results[score_number][0]['title']])
+        else:
+            if len(station_result[0]) > 0:
+                if station_result[0][0]['title'] in namelist:
+                    matchs_list = (['A', sentence, station_result[score_number][0]['title']]) 
+                    print(matchs_list)    
+                else: pass
+            else: pass
+    else :
+        matchs_list = (['A', sentence, results[score_number][0]['title']])
+    return matchs_list
+    
 
 if __name__ == "__main__":
     if args.track:
