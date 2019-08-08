@@ -17,6 +17,8 @@ def set_data(name):
 
         new_address = place_list[0]
         old_address = place_list[1]
+        
+        # 카테고리
 
         word = [name, old_address, new_address, time]  # 이름-시간-내용에 맞춰서 한 배열로 정리
         print("word: "+str(word))
