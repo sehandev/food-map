@@ -22,6 +22,7 @@ match_result_file = "./results/match.txt"
 
 
 def track_name():
+    # kakao_file에서 식당명 찾기
     t_time = time.time()  # 시작 시간
 
     processed_lines = preprocessing.preprocessing(kakao_file)  # [ [시간1, 이름1, 내용1], [시간2, 이름2, 내용2], ... ]
@@ -29,26 +30,26 @@ def track_name():
 
     count = 1
     for sentence in processed_lines:
-        names = find_name.kakao_log_to_nouns(sentence[2])
+        names = find_name.kakao_log_to_nouns(sentence[2])  # 내용에서 명사 찾기 (띄어쓰기, 명사, 조사)
         for name in names:
-            if not except_string.except_string(name):
-                results = naver_local.check_name(name, name)
+            if not except_string.except_string(name):  # 제외 : 3글자 미만, 숫자, 숫자+단위, 블랙리스트, 검색기록 있음
+                results = naver_local.check_name(name, name)  # 네이버 지도 검색해서 1순위 or 2순위 있으면 return
                 if results == -1:
                     print("네이버 지역 검색 API 할당량을 초과했습니다")
                     return
                 elif results != []:
-                    result_dict[name] = results
+                    result_dict[name] = results  # 검색결과 추가
 
                     count += 1
 
                     if count % 10 == 0:
+                        # 결과 중간 저장
                         manage_file.save_list_as_file(already_file, except_string.get_already_list())
                         manage_file.save_dict_as_json(track_result_file, result_dict)
                         print("count : " + str(count), end=" -> ")
 
                         t_time = time.time() - t_time
                         print('{:02d}:{:02d}'.format(int(t_time % 3600 // 60), int(t_time % 60)))
-
 
     manage_file.save_list_as_file(already_file, except_string.get_already_list())
     manage_file.save_dict_as_json(track_result_file, result_dict)
@@ -73,10 +74,28 @@ def grade_question():
                 file.write(token + " ")
             file.write('\n')
 
+def split_with(pivot, sentences):
+    new_sentences = []
+    for sentence in sentences:
+        if sentence.count(pivot) > 0:
+            splited = sentence.split(pivot)
+            for split in splited[:-1]:
+                if len(split) > 0:
+                    new_sentences.append(split + pivot)
+            new_sentences.append(splited[-1])
+        else:
+            new_sentences.append(sentence)
+
+    return_list = []
+    for sentence in new_sentences:
+        if sentence != "":
+            return_list.append(sentence.strip())
+    return return_list
+
+
 def find_match():
-    print("trace_name function")
-    processed_lines, restaurant_dict = track_name()
-    restaurant_list = restaurant_dict.keys()
+    processed_lines, restaurant_dict = track_name()  # kakao_file에서 식당명 찾기
+    restaurant_list = restaurant_dict.keys()  # 검색된 식당명 목록
 
     match_list = []
     count = 1
@@ -84,48 +103,57 @@ def find_match():
 
     for time, name, sentence in processed_lines:
         # 질문 찾기
-        score, tokens = is_question.grade(sentence)
-        if 0.65 <= score:
-            # 자동 선택
-            match_list.append(['QQ', sentence, score])
-        elif 0.55 <= score < 0.65:
-            # 수동 선택
-            match_list.append(['Q', sentence, score])
-        elif score < 0.55:
-            # 점수 미달
+        sentences = [sentence.replace(" $$ ", " ")]
 
-            # 답변 찾기
-            names = find_name.kakao_log_to_nouns(sentence)
-            if sentence.count("샵검색") > 0:
-                names.append(sentence.split("샵검색: #")[-1].replace(" ", ""))
+        pivots = ["?", "!"]
+        for pivot in pivots:
+            sentences = split_with(pivot, sentences)
 
-            # names = ["합정에", "괜찮은", "참치집", "있을까요", "있다"]
+        for sentence in sentences:
+            score, tokens = is_question.grade(sentence)
+            if 0.65 <= score:
+                # 자동 선택
+                match_list.append(['QQ', sentence, score])
+            elif 0.55 <= score < 0.65:
+                # 수동 선택
+                match_list.append(['Q', sentence, score])
+            elif score < 0.55:
+                # 점수 미달
 
-            not_answer = 1
-            for name in names:
-                if name in restaurant_list:
-                    results = restaurant_dict[name]
-                else:
-                    results = []
+                # 답변 찾기
+                names = find_name.kakao_log_to_nouns(sentence)
+                if sentence.count("샵검색") > 0:
+                    tmp_sentence = sentence.split("샵검색: #")[-1]
+                    if len(tmp_sentence.split()) > 1:
+                        names.append(tmp_sentence.replace(" ", ""))
 
-                if results != []:
-                    if len(results[0]) > 0:
-                        matchs_list = station_find(0, "공덕", name, sentence, results)
-                        match_list.append(matchs_list)
-                        not_answer = 0                    
-                        
-                    elif len(results[1]) > 0:
-                        matchs_list = station_find(1, "공덕", name, sentence, results)
-                        match_list.append(matchs_list)
-                        not_answer = 0
+                # names = ["합정에", "괜찮은", "참치집", "있을까요", "있다"]
+
+                not_answer = 1
+                for name in names:
+                    if name in restaurant_list:
+                        results = restaurant_dict[name]
                     else:
-                        # 유사 결과만 있음
-                        pass
-            if not_answer:
-                match_list.append(['N', sentence])
+                        results = []
+
+                    if results != []:
+                        if len(results[0]) > 0:
+                            matchs_list = station_find(0, "공덕", name, sentence, results)
+                            match_list.append(matchs_list)
+                            not_answer = 0
+
+                        elif len(results[1]) > 0:
+                            matchs_list = station_find(1, "공덕", name, sentence, results)
+                            match_list.append(matchs_list)
+                            not_answer = 0
+                        else:
+                            # 유사 결과만 있음
+                            pass
+                if not_answer:
+                    match_list.append(['N', sentence])
 
         # 진행 출력
-        if count % 100 == 0:
+        if count % 100 == 0 or count % finish_count == 0:
             print("{0:5} / {1:5}".format(count, finish_count))
         count += 1
 
@@ -134,8 +162,8 @@ def find_match():
 
 
 def station_find(score_number, station_name, name, sentence, results):
-    if station_name in sentence :
-        anothername = station_name + " " + name 
+    if station_name in sentence:
+        anothername = station_name + " " + name
         station_result = naver_local.check_name(anothername, name)
         namelist = []
         matchs_list = []
@@ -150,12 +178,13 @@ def station_find(score_number, station_name, name, sentence, results):
             for i in range(0, len(station_result)):
                 for j in range(0, len(station_result[i])):
                     if station_result[i][j]['title'] in namelist:
-                        matchs_list = (['A', sentence, station_result[i][j]['title']]) 
-                    else: pass
-    else :
+                        matchs_list = (['A', sentence, station_result[i][j]['title']])
+                    else:
+                        pass
+    else:
         matchs_list = (['A', sentence, results[score_number][0]['title']])
     return matchs_list
-    
+
 
 if __name__ == "__main__":
     if args.track:

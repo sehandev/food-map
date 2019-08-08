@@ -8,7 +8,8 @@ import os
 from difflib import SequenceMatcher
 from sources import manage_file
 
-categories = manage_file.read_file_as_list("./datas/category_list.txt")
+category_file = "./datas/category_list.txt"
+categories = manage_file.read_file_as_list(category_file)  # 카테고리 대분류 중 식당 목록
 
 검색결과수 = "10"
 검색시작위치 = "1"
@@ -22,6 +23,7 @@ client_index = 0
 
 
 def search_local(query):
+    # query를 네이버 지도에서 검색
     global client_index
 
     검색어 = urllib.parse.quote(query)
@@ -55,22 +57,24 @@ def search_local(query):
 
 
 def is_restaurant(query, pivot):
-    response_body = search_local(query)
+    # 검색결과에서 1(검색어와 동일한 식당명), 2(동일 식당명 + a) 찾기
+
+    response_body = search_local(query)  # query를 네이버 지도에서 검색
     if response_body == -1:  # 에러난 경우
         return [], -1
 
-    json_result = json.loads(response_body)
+    json_result = json.loads(response_body)  # 검색결과 정리
 
     results = [[] for _ in range(3)]
 
     for item in json_result["items"]:
-        title = item["title"].replace(" ", "")
-        category = item["category"]
-        road_address = item["roadAddress"]
-        if category.split('>')[0] in categories:
+        title = item["title"].replace(" ", "")  # 공백제거한 식당명
+        category = item["category"]  # 카테고리 (대분류 > 소분류)
+        road_address = item["roadAddress"]  # 도로명
+        if category.split('>')[0] in categories:  # 카테고리 대분류가
 
-            bolds = []  # 검색어에 겹치는 단어들
-            lefts = []  # 검색어에 겹치지 않는 단어들
+            bolds = []  # 검색어와 겹치는 단어들
+            lefts = []  # 검색어와 겹치지 않는 단어들
             tmps = title.split("</b>")
 
             for tmp in tmps[-1].split():
@@ -94,8 +98,7 @@ def is_restaurant(query, pivot):
             # 2단계 : 동일 title + 다른 단어
             elif similar_score == 1.0 and len(lefts) > 0:
                 tmp = ["본점", "본관", "원조", "별관", "분점"]
-                # t = len(tmp)
-                t = 5
+                t = len(tmp)
                 for left in lefts:
                     if left in tmp:
                         t = tmp.index(left)
@@ -116,11 +119,11 @@ def is_restaurant(query, pivot):
 
     check = 3
 
-    if len(results[0]) + len(results[1]) + len(results[2]) == 0:
+    if len(results[0]) + len(results[1]) + len(results[2]) == 0:  # 없음
         check = 0
-    elif len(results[0]) + len(results[1]) == 0:
+    elif len(results[0]) + len(results[1]) == 0:  # 3순위
         check = 1
-    elif len(results[0]) == 0:
+    elif len(results[0]) == 0:  # 2, 3순위
         check = 2
 
     return results, check
@@ -143,7 +146,8 @@ def print_result(count, results, index):
 
 
 def check_name(query, pivot):
-    results, check = is_restaurant(query, pivot)
+    # 네이버 지도 검색해서 1순위 or 2순위 있으면 return
+    results, check = is_restaurant(query, pivot)  # 검색결과에서 1(검색어와 동일한 식당명), 2(동일 식당명 + a) 찾기
     if check == -1:
         # 에러가 발생한 경우 : api 1일 할당량 초과
         return -1
