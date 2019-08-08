@@ -22,6 +22,7 @@ match_result_file = "./results/match.txt"
 
 
 def track_name():
+    # kakao_file에서 식당명 찾기
     t_time = time.time()  # 시작 시간
 
     processed_lines = preprocessing.preprocessing(kakao_file)  # [ [시간1, 이름1, 내용1], [시간2, 이름2, 내용2], ... ]
@@ -29,19 +30,20 @@ def track_name():
 
     count = 1
     for sentence in processed_lines:
-        names = find_name.kakao_log_to_nouns(sentence[2])
+        names = find_name.kakao_log_to_nouns(sentence[2])  # 내용에서 명사 찾기 (띄어쓰기, 명사, 조사)
         for name in names:
-            if not except_string.except_string(name):
-                results = naver_local.check_name(name, name)
+            if not except_string.except_string(name):  # 제외 : 3글자 미만, 숫자, 숫자+단위, 블랙리스트, 검색기록 있음
+                results = naver_local.check_name(name, name)  # 네이버 지도 검색해서 1순위 or 2순위 있으면 return
                 if results == -1:
                     print("네이버 지역 검색 API 할당량을 초과했습니다")
                     return
                 elif results != []:
-                    result_dict[name] = results
+                    result_dict[name] = results  # 검색결과 추가
 
                     count += 1
 
                     if count % 10 == 0:
+                        # 결과 중간 저장
                         manage_file.save_list_as_file(already_file, except_string.get_already_list())
                         manage_file.save_dict_as_json(track_result_file, result_dict)
                         print("count : " + str(count), end=" -> ")
@@ -92,9 +94,8 @@ def split_with(pivot, sentences):
 
 
 def find_match():
-    print("trace_name function")
-    processed_lines, restaurant_dict = track_name()
-    restaurant_list = restaurant_dict.keys()
+    processed_lines, restaurant_dict = track_name()  # kakao_file에서 식당명 찾기
+    restaurant_list = restaurant_dict.keys()  # 검색된 식당명 목록
 
     match_list = []
     count = 1
