@@ -75,6 +75,8 @@ def grade_question():
             file.write('\n')
 
 def split_with(pivot, sentences):
+    # pivot 기준으로 문장 나누기
+
     new_sentences = []
     for sentence in sentences:
         if sentence.count(pivot) > 0:
@@ -102,55 +104,70 @@ def find_match():
     finish_count = len(processed_lines)
 
     for time, name, sentence in processed_lines:
-        # 질문 찾기
-        sentences = [sentence.replace(" $$ ", " ")]
 
+        # pivot 기준으로 문장 나누기
+        sentences = [sentence]
         pivots = ["?", "!"]
         for pivot in pivots:
             sentences = split_with(pivot, sentences)
 
         for sentence in sentences:
-            score, tokens = is_question.grade(sentence)
-            if 0.65 <= score:
-                # 자동 선택
-                match_list.append(['QQ', sentence, score])
-            elif 0.55 <= score < 0.65:
-                # 수동 선택
-                match_list.append(['Q', sentence, score])
-            elif score < 0.55:
-                # 점수 미달
+            # 나눠진 문장에 대해서
 
-                # 답변 찾기
-                names = find_name.kakao_log_to_nouns(sentence)
-                if sentence.count("샵검색") > 0:
-                    tmp_sentence = sentence.split("샵검색: #")[-1]
-                    if len(tmp_sentence.split()) > 1:
-                        names.append(tmp_sentence.replace(" ", ""))
+            # 답변 찾기
+            names = find_name.kakao_log_to_nouns(sentence)
+            if sentence.count("샵검색") > 0:
+                tmp_sentence = sentence.split("샵검색: #")[-1]
+                if len(tmp_sentence.split()) > 1:
+                    names.append(tmp_sentence.replace(" ", ""))
 
-                # names = ["합정에", "괜찮은", "참치집", "있을까요", "있다"]
+            # names = ["합정에", "괜찮은", "참치집", "있을까요", "있다"]
 
-                not_answer = 1
-                for name in names:
-                    if name in restaurant_list:
-                        results = restaurant_dict[name]
-                    else:
-                        results = []
+            check = 1
+            restaurants = []
+            for name in names:
+                if name in restaurant_list:
+                    # 식당명이 문장에 있으면
 
-                    if results != []:
-                        if len(results[0]) > 0:
-                            matchs_list = station_find(0, "공덕", name, sentence, results)
-                            match_list.append(matchs_list)
-                            not_answer = 0
+                    location = ""
+                    if tmp_location in sentence:
+                        # 지역명이 문장에 있으면
+                        location = tmp_location
 
-                        elif len(results[1]) > 0:
-                            matchs_list = station_find(1, "공덕", name, sentence, results)
-                            match_list.append(matchs_list)
-                            not_answer = 0
-                        else:
-                            # 유사 결과만 있음
-                            pass
-                if not_answer:
-                    match_list.append(['N', sentence])
+                    restaurants = restaurant_dict[name]
+
+                    if len(results[0]) > 0:
+                        # station_find 수정 필요
+                        match = station_find(0, location, name, sentence, restaurants)
+                        match_list.append({"sentence" : sentence, "QAN" : "A", "location" : location, "restaurant" : match})
+                        check = 0
+
+                    elif len(results[1]) > 0:
+                        match = station_find(1, location, name, sentence, restaurants)
+                        match_list.append({"sentence" : sentence, "QAN" : "A", "location" : location, "restaurant" : match})
+                        check = 0
+
+            if check == 1:
+                # 이 문장이 답변이 아니었으면
+
+                # 질문 찾기
+                score, tokens = is_question.grade(sentence)
+                category, location = find_inform(sentence)  # find_inform는 세연 제작 중
+                if 0.65 <= score:
+                    # 확정
+                    match_list.append({"sentence" : sentence, "QAN" : "Q", "location" : location, "category" : category})
+                    check = 0
+                elif 0.55 <= score < 0.65:
+                    # 확인이 필요한 문장
+                    match_list.append({"sentence" : sentence, "QAN" : "QN", "location" : location, "category" : category})
+                    check = 0
+                elif score < 0.55:
+                    # 점수 미달
+                    pass
+
+            if check == 1:
+                # 이 문장이 답변도 질문도 아니었으면
+                match_list.append({"sentence" : sentence, "QAN" : "N"})
 
         # 진행 출력
         if count % 100 == 0 or count % finish_count == 0:
@@ -162,6 +179,8 @@ def find_match():
 
 
 def station_find(score_number, station_name, name, sentence, results):
+    if station_name == "":
+        return
     if station_name in sentence:
         anothername = station_name + " " + name
         station_result = naver_local.check_name(anothername, name)
