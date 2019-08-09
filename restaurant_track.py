@@ -137,13 +137,13 @@ def find_match():
                     restaurants = restaurant_dict[name]
 
                     if len(results[0]) > 0:
-                        # station_find 수정 필요
-                        match = station_find(0, location, name, sentence, restaurants)
+                        # location_find 수정 필요
+                        match = location_find(0, location, name, sentence, restaurants)
                         match_list.append({"sentence" : sentence, "QAN" : "A", "location" : location, "restaurant" : match})
                         check = 0
 
                     elif len(results[1]) > 0:
-                        match = station_find(1, location, name, sentence, restaurants)
+                        match = location_find(1, location, name, sentence, restaurants)
                         match_list.append({"sentence" : sentence, "QAN" : "A", "location" : location, "restaurant" : match})
                         check = 0
 
@@ -178,26 +178,26 @@ def find_match():
     manage_file.save_list_as_file(match_result_file, match_list)
 
 
-def station_find(score_number, station_name, name, sentence, results):
-    if station_name == "":
+def location_find(score_number, location_name, name, sentence, results):
+    if location_name == "":
         return
-    if station_name in sentence:
-        anothername = station_name + " " + name
-        station_result = naver_local.check_name(anothername, name)
+    if location_name in sentence:
+        anothername = location_name + " " + name
+        location_result = naver_local.check_name(anothername, name)
         namelist = []
         matchs_list = []
         for i in range(0, len(results)):
             for j in range(0, len(results[i])):
                 namelist.append(results[i][j]['title'])
 
-        if station_result == []:
+        if location_result == []:
             # 넘어가고 원래 결과 그대로 사용
             matchs_list = (['A', sentence, results[score_number][0]['title']])
         else:
-            for i in range(0, len(station_result)):
-                for j in range(0, len(station_result[i])):
-                    if station_result[i][j]['title'] in namelist:
-                        matchs_list = (['A', sentence, station_result[i][j]['title']])
+            for i in range(0, len(location_result)):
+                for j in range(0, len(location_result[i])):
+                    if location_result[i][j]['title'] in namelist:
+                        matchs_list = (['A', sentence, location_result[i][j]['title']])
                     else:
                         pass
     else:
