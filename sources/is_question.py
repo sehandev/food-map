@@ -35,7 +35,7 @@ def grade(line):
     score = 0
     count = 0
 
-    line = hangul.sub(" ", line)
+    line = hangul.sub(" ", line)  # 기호(!?), 한글, 숫자만 남기기
     for subway in subway_list:
         line = line.replace(subway, "지역")
     for rastuarant in rastuarant_list:
