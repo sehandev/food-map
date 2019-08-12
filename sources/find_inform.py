@@ -1,8 +1,8 @@
-with open("../datas/food_list.txt", 'r') as file:
+with open("./datas/food_list.txt", 'r') as file:
     food_list = file.read().split("\n")
-with open("../datas/place_name.txt", 'r') as file2:
+with open("./datas/place_name.txt", 'r') as file2:
     place_name = file2.read().split('\n')
-with open("../datas/subway_station.txt", 'r') as file3:
+with open("./datas/subway_station.txt", 'r') as file3:
     subway_name = file3.read().split('\n')
 
 
@@ -38,7 +38,7 @@ def food_category(food_name, category_list):
 def making_divide_list():
     food_list_middle = []
     food_list_middle_two = []
-    with open("../datas/food_list.txt", 'r') as file:
+    with open("./datas/food_list.txt", 'r') as file:
         food_list2 = file.read().split("-")
     for i in range(0, 8):
         word = food_list2[i]

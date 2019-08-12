@@ -1,5 +1,5 @@
 import re
-from sources import manage_file, except_list_of_place
+from sources import manage_file
 from twkorean import TwitterKoreanProcessor
 
 processor = TwitterKoreanProcessor()
@@ -8,10 +8,11 @@ hangul = re.compile("[^ !?0-9가-힣]+")
 keyword_file = "./datas/question_keywords.txt"
 restaurant_file = "./results/restaurant.json"
 food_file = "./datas/food_list.txt"
+place_file = "./datas/place_name.txt"
 
 keyword_dict = manage_file.read_txt_as_dict(keyword_file)
 keyword_list = list(keyword_dict.keys())
-subway_list = except_list_of_place.except_place()
+place_list = manage_file.read_file_as_list(place_file)
 rastuarant_list = manage_file.read_json_as_dict(restaurant_file).keys()
 food_list = manage_file.read_file_as_list(food_file)
 
@@ -35,9 +36,9 @@ def grade(line):
     score = 0
     count = 0
 
-    line = hangul.sub(" ", line)
-    for subway in subway_list:
-        line = line.replace(subway, "지역")
+    line = hangul.sub(" ", line)  # 기호(!?), 한글, 숫자만 남기기
+    for place in place_list:
+        line = line.replace(place, "지역")
     for rastuarant in rastuarant_list:
         line = line.replace(rastuarant, "이름")
     for food in food_list:

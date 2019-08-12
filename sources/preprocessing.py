@@ -59,7 +59,7 @@ def preprocessing(kakao_file):
                         new_lines.append(time_name_log)
                         continue
 
-        new_lines[-1][2] += " $$ " + line
+        new_lines[-1][2] += " " + line
 
     pre_name = new_lines[0][1]  # 동일인물이 여러 번 말하면 합치기 위한
     pre_index = 0
@@ -69,40 +69,10 @@ def preprocessing(kakao_file):
             if new_lines[i][2][:7] == " 톡게시판 '":
                 continue
             if pre_name == new_lines[i][1]:  # 이름이 같으면
-                new_lines[pre_index][2] += " $$ " + new_lines[i][2]  # 내용 연결
+                new_lines[pre_index][2] += " " + new_lines[i][2]  # 내용 연결
             else:  # 이름이 다르면
                 pre_name = new_lines[i][1]
                 pre_index = i
                 processed_lines.append(new_lines[i])
-
-    # with open(kakao_file[:-4] + "_processed.txt", 'w') as file:
-    #     for line in processed_lines:
-    #         file.write(line[0] + ',')
-    #         file.write(line[1] + ' : ')
-    #         file.write(line[2] + '\n')
-    #
-    # with open(kakao_file[:-4] + "_log.txt", 'w') as file:
-    #     for line in processed_lines:
-    #         file.write(line[2] + '\n')
-
-    # with open(kakao_file[:-4] + "_processed_without_time.txt", 'w') as file:
-    #     for line in processed_lines:
-    #         file.write(line[1][1:] + ' : ')
-    #         file.write(line[2] + '\n')
-
-    # with open(kakao_file[:-4] + "_processed_only_question.txt", 'w') as file:
-    #     for line in processed_lines:
-    #         if line[2].count('?') > 0:
-    #             file.write(line[2].strip() + '\n')
-    #
-    # with open(kakao_file[:-4] + "_processed_not_question.txt", 'w') as file:
-    #     for line in processed_lines:
-    #         if line[2].count('?') == 0 and line[2].count('!') == 0:
-    #             file.write(line[2].strip() + '\n')
-    #
-    # with open(kakao_file[:-4] + "_processed_only_exclamation.txt", 'w') as file:
-    #     for line in processed_lines:
-    #         if line[2].count('!') > 0:
-    #             file.write(line[2].strip() + '\n')
 
     return processed_lines

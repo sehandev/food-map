@@ -1,4 +1,4 @@
-from sources import manage_file, except_list_of_place
+from sources import manage_file
 
 josa_file = "./datas/josa_list.txt"
 already_file = "./datas/already_list.txt"
