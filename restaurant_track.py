@@ -1,4 +1,4 @@
-from sources import preprocessing, find_name, except_string, naver_local, manage_file, is_question, find_inform
+from sources import preprocessing, find_name, except_string, naver_local, manage_file, is_question, find_inform, answer_check, match_support
 import time
 import signal
 import pathlib
@@ -144,16 +144,17 @@ def find_match():
                     elif pre_restaurant != "":
                         # 이전에 식당명이 있었으면
                         match, location = answer_check.location_find(restaurant_dict[pre_restaurant], pre_restaurant, places)
-                        match_list.append({"sentence" : sentence, "QAN" : "A", "location" : location, "restaurant" : match})
+                        match_list.append({"sentence" : sentence, "QAN" : "A", "location" : location, "name" : pre_restaurant, "restaurant" : match})
 
                         pre_restaurant = noun
-                        places.remove(location)
+                        if location != "":
+                            places.remove(location)
                         check = 0
 
             if check == 0:
                 # 식당명이 더 나오지 않아 추가되지 않은 식당명 처리
                 match, location = answer_check.location_find(restaurant_dict[pre_restaurant], pre_restaurant, places)
-                match_list.append({"sentence" : sentence, "QAN" : "A", "location" : location, "restaurant" : match})
+                match_list.append({"sentence" : sentence, "QAN" : "A", "location" : location, "name" : pre_restaurant, "restaurant" : match})
 
             if check == 1:
                 # 이 문장이 답변이 아니었으면
@@ -182,8 +183,51 @@ def find_match():
             print("{0:5} / {1:5}".format(count, finish_count))
         count += 1
 
+    # QAN 확인 완료한 문장들 중 QA match 찾기
+    match_result = []
+    for i in range(len(match_list)):
+        if match_list[i]["QAN"] == "A":
+            tmp_question_list = []
+            for j in range(i-10, i):
+                if match_list[j]["QAN"] == "Q":
+                    # 지역 +10, 식당 순위 -1, 카테고리 +1, 순서 +0.1
+                    match_score = -3
+
+                    match = match_list[i]["restaurant"]
+
+                    location_score = 0
+                    for location in match_list[j]["location"]:
+                        if match_list[i]["location"] == location:
+                            location_score = 2
+
+                        match, _ = answer_check.location_find(match, match_list[i]["name"], location)
+
+                    highest_restaurant = "hello"
+                    for grade in range(3):
+                        for restaurant in match[grade]:
+                            a_category = match_support.find_category(restaurant["category"])
+                            category_score = 0
+                            for q_category in match_list[j]["category"]:
+                                if a_category == q_category:
+                                    category_score = 1
+
+                            new_score = location_score - grade + category_score + (j * 0.1)
+                            if match_score < new_score:
+                                match_score = new_score
+                                highest_restaurant = restaurant
+
+                    tmp_question_list.append([match_score, highest_restaurant, j])
+
+            if tmp_question_list != []:
+                tmp_question_list.sort(key=lambda x: x[0])
+
+                match_result.append(match_list[tmp_question_list[0][2]])
+                match_result.append(match_list[i])
+                match_result.append(tmp_question_list[0][1])
+                match_result.append("")
+
     # 결과 출력
-    manage_file.save_list_as_file(match_result_file, match_list)
+    manage_file.save_list_as_file(match_result_file, match_result)
 
 
 if __name__ == "__main__":
