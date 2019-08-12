@@ -123,6 +123,8 @@ def is_restaurant(query, pivot):
         check = 0
     elif len(results[0]) + len(results[1]) == 0:  # 3순위
         check = 1
+        if query != pivot:
+            check = 3
     elif len(results[0]) == 0:  # 2, 3순위
         check = 2
 

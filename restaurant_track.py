@@ -1,4 +1,6 @@
-from sources import preprocessing, find_name, except_string, naver_local, manage_file, is_question
+from sources import preprocessing, find_name, except_string,
+                    naver_local, manage_file, is_question,
+                    find_inform
 import time
 import signal
 import pathlib
@@ -16,6 +18,8 @@ args = parser.parse_args()
 kakao_file = "./datas/ADE_test_2.txt"
 # kakao_file = "./datas/ADE_test_3.txt"
 already_file = "./datas/already_list.txt"
+place_file = "./datas/place_name.txt"
+
 track_result_file = "./results/restaurant.json"
 grade_result_file = "./results/grade.txt"
 match_result_file = "./results/match.txt"
@@ -30,15 +34,15 @@ def track_name():
 
     count = 1
     for sentence in processed_lines:
-        names = find_name.kakao_log_to_nouns(sentence[2])  # 내용에서 명사 찾기 (띄어쓰기, 명사, 조사)
-        for name in names:
-            if not except_string.except_string(name):  # 제외 : 3글자 미만, 숫자, 숫자+단위, 블랙리스트, 검색기록 있음
-                results = naver_local.check_name(name, name)  # 네이버 지도 검색해서 1순위 or 2순위 있으면 return
+        nouns = find_name.kakao_log_to_nouns(sentence[2])  # 내용에서 명사 찾기 (띄어쓰기, 명사, 조사)
+        for noun in nouns:
+            if not except_string.except_string(noun):  # 제외 : 3글자 미만, 숫자, 숫자+단위, 블랙리스트, 검색기록 있음
+                results = naver_local.check_name(noun, noun)  # 네이버 지도 검색해서 1순위 or 2순위 있으면 return
                 if results == -1:
                     print("네이버 지역 검색 API 할당량을 초과했습니다")
                     return
                 elif results != []:
-                    result_dict[name] = results  # 검색결과 추가
+                    result_dict[noun] = results  # 검색결과 추가
 
                     count += 1
 
@@ -103,6 +107,8 @@ def find_match():
     count = 1
     finish_count = len(processed_lines)
 
+    place_list = manage_file.read_file_as_list(place_file)
+
     for time, name, sentence in processed_lines:
 
         # pivot 기준으로 문장 나누기
@@ -115,44 +121,48 @@ def find_match():
             # 나눠진 문장에 대해서
 
             # 답변 찾기
-            names = find_name.kakao_log_to_nouns(sentence)
+            nouns = find_name.kakao_log_to_nouns(sentence)
             if sentence.count("샵검색") > 0:
                 tmp_sentence = sentence.split("샵검색: #")[-1]
                 if len(tmp_sentence.split()) > 1:
-                    names.append(tmp_sentence.replace(" ", ""))
+                    nouns.append(tmp_sentence.replace(" ", ""))
 
-            # names = ["합정에", "괜찮은", "참치집", "있을까요", "있다"]
+            # nouns = ["합정에", "괜찮은", "참치집", "있을까요", "있다"]
 
             check = 1
-            restaurants = []
-            for name in names:
-                if name in restaurant_list:
+            places = []
+            pre_restaurant= ""
+
+            for noun in nouns:
+                if noun in place_list:
+                    places.append(noun)
+
+                if noun in restaurant_list:
                     # 식당명이 문장에 있으면
-
-                    location = ""
-                    if tmp_location in sentence:
-                        # 지역명이 문장에 있으면
-                        location = tmp_location
-
-                    restaurants = restaurant_dict[name]
-
-                    if len(results[0]) > 0:
-                        # location_find 수정 필요
-                        match = location_find(0, location, name, sentence, restaurants)
+                    if pre_restaurant == "":
+                        # 첫 식당명이면
+                        pre_restaurant = noun
+                        check = 0
+                    elif pre_restaurant != "":
+                        # 이전에 식당명이 있었으면
+                        match, location = answer_check.location_find(restaurant_dict[pre_restaurant], pre_restaurant, places)
                         match_list.append({"sentence" : sentence, "QAN" : "A", "location" : location, "restaurant" : match})
+
+                        pre_restaurant = noun
+                        places.remove(location)
                         check = 0
 
-                    elif len(results[1]) > 0:
-                        match = location_find(1, location, name, sentence, restaurants)
-                        match_list.append({"sentence" : sentence, "QAN" : "A", "location" : location, "restaurant" : match})
-                        check = 0
+            if check == 0:
+                # 식당명이 더 나오지 않아 추가되지 않은 식당명 처리
+                match, location = answer_check.location_find(restaurant_dict[pre_restaurant], pre_restaurant, places)
+                match_list.append({"sentence" : sentence, "QAN" : "A", "location" : location, "restaurant" : match})
 
             if check == 1:
                 # 이 문장이 답변이 아니었으면
 
                 # 질문 찾기
                 score, tokens = is_question.grade(sentence)
-                category, location = find_inform(sentence)  # find_inform는 세연 제작 중
+                category, location = find_inform.find_inform(sentence)  # find_inform는 세연 제작 중
                 if 0.65 <= score:
                     # 확정
                     match_list.append({"sentence" : sentence, "QAN" : "Q", "location" : location, "category" : category})
@@ -163,7 +173,7 @@ def find_match():
                     check = 0
                 elif score < 0.55:
                     # 점수 미달
-                    pass
+                    check = 1
 
             if check == 1:
                 # 이 문장이 답변도 질문도 아니었으면
@@ -176,33 +186,6 @@ def find_match():
 
     # 결과 출력
     manage_file.save_list_as_file(match_result_file, match_list)
-
-
-def location_find(score_number, location_name, name, sentence, results):
-    if location_name == "":
-        return
-    if location_name in sentence:
-        anothername = location_name + " " + name
-        location_result = naver_local.check_name(anothername, name)
-        namelist = []
-        matchs_list = []
-        for i in range(0, len(results)):
-            for j in range(0, len(results[i])):
-                namelist.append(results[i][j]['title'])
-
-        if location_result == []:
-            # 넘어가고 원래 결과 그대로 사용
-            matchs_list = (['A', sentence, results[score_number][0]['title']])
-        else:
-            for i in range(0, len(location_result)):
-                for j in range(0, len(location_result[i])):
-                    if location_result[i][j]['title'] in namelist:
-                        matchs_list = (['A', sentence, location_result[i][j]['title']])
-                    else:
-                        pass
-    else:
-        matchs_list = (['A', sentence, results[score_number][0]['title']])
-    return matchs_list
 
 
 if __name__ == "__main__":
