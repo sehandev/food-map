@@ -1,6 +1,4 @@
-from sources import preprocessing, find_name, except_string,
-                    naver_local, manage_file, is_question,
-                    find_inform
+from sources import preprocessing, find_name, except_string, naver_local, manage_file, is_question, find_inform
 import time
 import signal
 import pathlib
