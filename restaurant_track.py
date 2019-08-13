@@ -4,6 +4,7 @@ import signal
 import pathlib
 import json
 import argparse
+import csv
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--track", help="tracking restaurant name", action="store_true")
@@ -20,7 +21,7 @@ place_file = "./datas/place_name.txt"
 
 track_result_file = "./results/restaurant.json"
 grade_result_file = "./results/grade.txt"
-match_result_file = "./results/match.txt"
+match_result_file = "./results/match_result.csv"
 
 
 def track_name():
@@ -99,8 +100,6 @@ def split_with(pivot, sentences):
 
 def find_match():
     processed_lines, restaurant_dict = track_name()  # kakao_file에서 식당명 찾기
-    category_regularation.categories_find(restaurant_dict)
-    return
     restaurant_list = restaurant_dict.keys()  # 검색된 식당명 목록
 
     match_list = []
@@ -223,18 +222,27 @@ def find_match():
             if tmp_question_list != []:
                 tmp_question_list.sort(key=lambda x: x[0])
 
+                q = str(match_list[tmp_question_list[0][2]]["sentence"])
+                a = str(match_list[i]["sentence"])
+
                 recommend = tmp_question_list[0][1]
-                q = match_list[tmp_question_list[0][2]]
-                a = match_list[i]
+                title = recommend["title"]
+                category = category_regularation.find_category(recommend["category"])
+
+                # 매칭 : [Q, A, 식당 정보]
+                match_result.append([q, a, title, category])
 
                 # 식당 정보 : [식당명, 카테고리, 질문+답변 문장]
-                restaurant_data.append([recommend["name"], recommend["category"], q["sentence"] + a["sentence"]])
-
-    # 식당 정보 -> 식당명, 지번, 도로명, 카테고리, 영업시간, 태그
-    crawling_place.set_data(restaurant_data)
+                restaurant_data.append([title, category, q + " " + a])
 
     # 매칭 결과 출력
-    manage_file.save_list_as_file(match_result_file, match_result)
+    with open(match_result_file, 'w', encoding='euc-kr') as file:
+        writer = csv.writer(file)
+        writer.writerows(match_result)
+    # manage_file.save_list_as_file(match_result_file, match_result)
+
+    # 식당 정보 -> 식당명, 지번, 도로명, 카테고리, 영업시간, 태그
+    # crawling_place.set_data(restaurant_data)
 
 
 if __name__ == "__main__":
