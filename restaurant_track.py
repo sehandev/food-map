@@ -230,12 +230,13 @@ def find_match():
                 recommend = tmp_question_list[0][1]
                 title = recommend["title"]
                 category = category_regularation.find_category(recommend["category"])
+                address = recommend["address"]
 
                 # 매칭 : [Q, A, 식당 정보]
                 match_result.append([str(q["sentence"]), str(a["sentence"]), title, category])
 
                 # 식당 정보 : [식당명, 카테고리, 질문+답변 문장]
-                restaurant_data.append([title, category, q["sentence"] + " " + a["sentence"]])
+                restaurant_data.append([title, category, q["sentence"] + " " + a["sentence"], address])
 
                 # 유저 정보 : [이름, 시간, 내용]
                 questioner_list.append([q["name"], q["time"], q["sentence"]])
