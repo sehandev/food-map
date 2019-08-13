@@ -7,15 +7,18 @@ import pandas as pd
 from sources import find_tag
 
 def set_data(name, place_list, i):
-    # [[식당명, 카테고리, 질문+답변 문장][][][][]] (날아옴)
+    # [[식당명, 카테고리, 질문+답변 문장, address][][][][]] (날아옴)
     if name != '':
         time_list = findtime(name)
-        print(time_list)
+        if time_list = "":
+            time_list = " "
         places_list = findplace(name)  # 장소
         # tag = data_divide[3]
         time = ', '.join(time_list)
-        new_address = places_list[0]
-        old_address = places_list[1]
+        new_address = place_list[3]
+        if place_list != "":
+            old_address = places_list[1]
+        else : old_address = " "
 
         tag = find_tag.tag_list(place_list[2], place_list[1])
 
