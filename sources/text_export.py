@@ -37,9 +37,9 @@ def text_export(QNA, user_data):
     data = data.set_index("이름")
 
     if QNA == "Q":
-        data.to_csv('../datas/ADE_question_users', encoding='euc-kr')
+        data.to_csv('./datas/ADE_question_users', encoding='euc-kr')
     elif QNA == "A":
-        data.to_csv('../datas/ADE_answer_users', encoding='euc-kr')
+        data.to_csv('./datas/ADE_answer_users', encoding='euc-kr')
 
 
 if __name__ == '__main__':

@@ -4,7 +4,7 @@ import re
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
-from find_tag import tag_list
+from sources import find_tag
 
 def set_data(name, place_list, i):
     # [[식당명, 카테고리, 질문+답변 문장][][][][]] (날아옴)
@@ -17,7 +17,7 @@ def set_data(name, place_list, i):
         new_address = places_list[0]
         old_address = places_list[1]
 
-        tag = tag_list(place_list[2], place_list[1])
+        tag = find_tag.tag_list(place_list[2], place_list[1])
         # 카테고리
 
         word = [name, old_address, new_address, time, tag]  # 이름-시간-내용에 맞춰서 한 배열로 정리
@@ -45,7 +45,7 @@ def text_export(place_list):
         data.columns = ['식당명', '지번', '위치', '영업시간', '태그']
         data = data.set_index("식당명")
 
-        data.to_csv('../datas/ADE_place.csv', encoding='euc-kr')
+        data.to_csv('./results/ADE_place.csv', encoding='euc-kr')
 
 def findplace(search):
     url = "https://search.naver.com/search.naver?sm=top_hty&fbm=1&ie=utf8&query=" + search
