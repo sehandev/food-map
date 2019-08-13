@@ -1,4 +1,4 @@
-from sources import preprocessing, find_name, except_string, naver_local, manage_file, is_question, find_inform, answer_check, category_regularation, crawling_place
+from sources import preprocessing, find_name, except_string, naver_local, manage_file, is_question, find_inform, answer_check, category_regularation, crawling_place, text_export
 import time
 import signal
 import pathlib
@@ -145,7 +145,7 @@ def find_match():
                     elif pre_restaurant != "":
                         # 이전에 식당명이 있었으면
                         match, location = answer_check.location_find(restaurant_dict[pre_restaurant], pre_restaurant, places)
-                        match_list.append({"sentence" : sentence, "QAN" : "A", "location" : location, "name" : pre_restaurant, "restaurant" : match})
+                        match_list.append({"name" : name, "time" : time, "sentence" : sentence, "QAN" : "A", "location" : location, "title" : pre_restaurant, "restaurant" : match})
 
                         pre_restaurant = noun
                         if location != "":
@@ -155,7 +155,7 @@ def find_match():
             if check == 0:
                 # 식당명이 더 나오지 않아 추가되지 않은 식당명 처리
                 match, location = answer_check.location_find(restaurant_dict[pre_restaurant], pre_restaurant, places)
-                match_list.append({"sentence" : sentence, "QAN" : "A", "location" : location, "name" : pre_restaurant, "restaurant" : match})
+                match_list.append({"name" : name, "time" : time, "sentence" : sentence, "QAN" : "A", "location" : location, "title" : pre_restaurant, "restaurant" : match})
 
             if check == 1:
                 # 이 문장이 답변이 아니었으면
@@ -165,11 +165,11 @@ def find_match():
                 category, location = find_inform.find_inform(sentence)  # find_inform는 세연 제작 중
                 if 0.65 <= score:
                     # 확정
-                    match_list.append({"sentence" : sentence, "QAN" : "Q", "location" : location, "category" : category})
+                    match_list.append({"name" : name, "time" : time, "sentence" : sentence, "QAN" : "Q", "location" : location, "category" : category})
                     check = 0
                 elif 0.55 <= score < 0.65:
                     # 확인이 필요한 문장
-                    match_list.append({"sentence" : sentence, "QAN" : "QN", "location" : location, "category" : category})
+                    match_list.append({"name" : name, "time" : time, "sentence" : sentence, "QAN" : "QN", "location" : location, "category" : category})
                     check = 0
                 elif score < 0.55:
                     # 점수 미달
@@ -177,7 +177,7 @@ def find_match():
 
             if check == 1:
                 # 이 문장이 답변도 질문도 아니었으면
-                match_list.append({"sentence" : sentence, "QAN" : "N"})
+                match_list.append({"name" : name, "time" : time, "sentence" : sentence, "QAN" : "N"})
 
         # 진행 출력
         if count % 100 == 0 or count % finish_count == 0:
@@ -187,6 +187,8 @@ def find_match():
     # QAN 확인 완료한 문장들 중 QA match 찾기
     match_result = []
     restaurant_data = []
+    questioner_list = []
+    answerer_list = []
     for i in range(len(match_list)):
         if match_list[i]["QAN"] == "A":
             tmp_question_list = []
@@ -202,7 +204,7 @@ def find_match():
                         if match_list[i]["location"] == location:
                             location_score = 2
 
-                        match, _ = answer_check.location_find(match, match_list[i]["name"], location)
+                        match, _ = answer_check.location_find(match, match_list[i]["title"], location)
 
                     for grade in range(3):
                         for restaurant in match[grade]:
@@ -222,27 +224,34 @@ def find_match():
             if tmp_question_list != []:
                 tmp_question_list.sort(key=lambda x: x[0])
 
-                q = str(match_list[tmp_question_list[0][2]]["sentence"])
-                a = str(match_list[i]["sentence"])
+                q = str(match_list[tmp_question_list[0][2]])
+                a = str(match_list[i])
 
                 recommend = tmp_question_list[0][1]
                 title = recommend["title"]
                 category = category_regularation.find_category(recommend["category"])
 
                 # 매칭 : [Q, A, 식당 정보]
-                match_result.append([q, a, title, category])
+                match_result.append([q["sentence"], a["sentence"], title, category])
 
                 # 식당 정보 : [식당명, 카테고리, 질문+답변 문장]
-                restaurant_data.append([title, category, q + " " + a])
+                restaurant_data.append([title, category, q["sentence"] + " " + a["sentence"]])
+
+                # 유저 정보 : [이름, 시간, 내용]
+                questioner_list.append([q["name"], q["time"], q["sentence"]])
+                answerer_list.append([a["name"], a["time"], a["sentence"]])
 
     # 매칭 결과 출력
     with open(match_result_file, 'w', encoding='euc-kr') as file:
         writer = csv.writer(file)
         writer.writerows(match_result)
-    # manage_file.save_list_as_file(match_result_file, match_result)
 
     # 식당 정보 -> 식당명, 지번, 도로명, 카테고리, 영업시간, 태그
-    # crawling_place.set_data(restaurant_data)
+    crawling_place.set_data(restaurant_data)
+
+    # 유저 정보 -> 저장
+    text_export.question_data(questioner_list)
+    text_export.answer_data(answerer_list)
 
 
 if __name__ == "__main__":
