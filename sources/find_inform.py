@@ -1,6 +1,8 @@
 with open("./datas/food_list.txt", 'r') as file:
     str = file.read()
     food_list = str.split("\n")
+    food_list = list(set(food_list))
+    food_list.remove("-")
     food_list2 = str.split("-")
 with open("./datas/place_name.txt", 'r') as file2:
     place_name = file2.read().split('\n')
@@ -26,6 +28,14 @@ def making_divide_list():
 category_list = making_divide_list()
 
 
+def food_category(food_name):
+    for j in range(0, 8):
+        for k in range(0, len(category_list[j])):
+            if food_name == category_list[j][k]:
+                food_category = category_list[j][0]
+    return food_category
+
+
 def find_inform(sentence):
 
     question_food_category = []
@@ -43,14 +53,6 @@ def find_inform(sentence):
             question_place_name.append(place)
 
     return question_food_category, question_place_name
-
-
-def food_category(food_name):
-    for j in range(0, 8):
-        for k in range(0, len(category_list[j])):
-            if food_name == category_list[j][k]:
-                food_category = category_list[j][0]
-    return food_category
 
 
 if __name__ == "__main__":

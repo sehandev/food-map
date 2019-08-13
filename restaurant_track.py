@@ -99,6 +99,8 @@ def split_with(pivot, sentences):
 
 def find_match():
     processed_lines, restaurant_dict = track_name()  # kakao_file에서 식당명 찾기
+    category_regularation.categories_find(restaurant_dict)
+    return
     restaurant_list = restaurant_dict.keys()  # 검색된 식당명 목록
 
     match_list = []
@@ -203,10 +205,9 @@ def find_match():
 
                         match, _ = answer_check.location_find(match, match_list[i]["name"], location)
 
-                    highest_restaurant = "hello"
                     for grade in range(3):
                         for restaurant in match[grade]:
-                            a_category = match_support.find_category(restaurant["category"])
+                            a_category = category_regularation.find_category(restaurant["category"])
                             category_score = 0
                             for q_category in match_list[j]["category"]:
                                 if a_category == q_category:

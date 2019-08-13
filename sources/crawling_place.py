@@ -4,7 +4,6 @@ import re
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
-from find_name import kakao_log_to_nouns
 
 
 def set_data(name):
@@ -17,7 +16,7 @@ def set_data(name):
 
         new_address = place_list[0]
         old_address = place_list[1]
-        
+
         # 카테고리
 
         word = [name, old_address, new_address, time]  # 이름-시간-내용에 맞춰서 한 배열로 정리
