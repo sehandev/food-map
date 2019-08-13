@@ -1,4 +1,4 @@
-from sources import preprocessing, find_name, except_string, naver_local, manage_file, is_question, find_inform, answer_check, match_support
+from sources import preprocessing, find_name, except_string, naver_local, manage_file, is_question, find_inform, answer_check, category_regularation, crawling_place
 import time
 import signal
 import pathlib
@@ -185,6 +185,7 @@ def find_match():
 
     # QAN 확인 완료한 문장들 중 QA match 찾기
     match_result = []
+    restaurant_data = []
     for i in range(len(match_list)):
         if match_list[i]["QAN"] == "A":
             tmp_question_list = []
@@ -221,12 +222,17 @@ def find_match():
             if tmp_question_list != []:
                 tmp_question_list.sort(key=lambda x: x[0])
 
-                match_result.append(match_list[tmp_question_list[0][2]])
-                match_result.append(match_list[i])
-                match_result.append(tmp_question_list[0][1])
-                match_result.append("")
+                recommend = tmp_question_list[0][1]
+                q = match_list[tmp_question_list[0][2]]
+                a = match_list[i]
 
-    # 결과 출력
+                # 식당 정보 : [식당명, 카테고리, 질문+답변 문장]
+                restaurant_data.append([recommend["name"], recommend["category"], q["sentence"] + a["sentence"]])
+
+    # 식당 정보 -> 식당명, 지번, 도로명, 카테고리, 영업시간, 태그
+    crawling_place.set_data(restaurant_data)
+
+    # 매칭 결과 출력
     manage_file.save_list_as_file(match_result_file, match_result)
 
 
