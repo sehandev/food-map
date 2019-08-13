@@ -85,8 +85,6 @@ def findtime(search):
 def main():
     #[[식당명, 카테고리, 질문+답변 문장][][][][]] (날아옴)
     # place_list = []
-    place_list = []
-    place_list = [["해우리참치", "한식", "혹시 공덕에 가성비 4~6만원 이하 회식장소 있나요? 해우리도 좋아요"],["호호미욜","카페", "홍대에 분위기 좋은 카페 있나요? 호호미욜 좋아요"]]
     text_export(place_list)
 
 if __name__ == '__main__':

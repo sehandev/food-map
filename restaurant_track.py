@@ -224,15 +224,15 @@ def find_match():
             if tmp_question_list != []:
                 tmp_question_list.sort(key=lambda x: x[0])
 
-                q = str(match_list[tmp_question_list[0][2]])
-                a = str(match_list[i])
+                q = match_list[tmp_question_list[0][2]]
+                a = match_list[i]
 
                 recommend = tmp_question_list[0][1]
                 title = recommend["title"]
                 category = category_regularation.find_category(recommend["category"])
 
                 # 매칭 : [Q, A, 식당 정보]
-                match_result.append([q["sentence"], a["sentence"], title, category])
+                match_result.append([str(q["sentence"]), str(a["sentence"]), title, category])
 
                 # 식당 정보 : [식당명, 카테고리, 질문+답변 문장]
                 restaurant_data.append([title, category, q["sentence"] + " " + a["sentence"]])
@@ -247,7 +247,7 @@ def find_match():
         writer.writerows(match_result)
 
     # 식당 정보 -> 식당명, 지번, 도로명, 카테고리, 영업시간, 태그
-    crawling_place.set_data(restaurant_data)
+    crawling_place.text_export(restaurant_data)
 
     # 유저 정보 -> 저장
     text_export.question_data(questioner_list)
