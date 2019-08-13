@@ -20,9 +20,8 @@ def categories_find(dict):
             for restaurant in tt:
                 categories.extend(restaurant["category"].split('>'))
 
-    locale.setlocale(locale.LC_ALL, '') #한국 기준으로 set
     categories = list(set(categories))
-    categories = sorted(categories, key=functools.cmp_to_key(locale.strcoll))
+    categories.sort()
     print(*categories, sep='\n')
 
 def find_category(pre_category):
