@@ -39,7 +39,7 @@ def search_local(query):
         rescode = response.getcode()
         if(rescode == 200):
             response_body = response.read()
-            time.sleep(0.05)
+            time.sleep(0.07)
             return response_body
         else:
             print("Error Code:" + rescode)

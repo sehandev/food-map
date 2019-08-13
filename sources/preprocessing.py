@@ -61,18 +61,20 @@ def preprocessing(kakao_file):
 
         new_lines[-1][2] += " " + line
 
-    pre_name = new_lines[0][1]  # 동일인물이 여러 번 말하면 합치기 위한
-    pre_index = 0
-    processed_lines = [new_lines[0]]
-    for i in range(1, len(new_lines)):
-        if new_lines[i][2] != ' ':
-            if new_lines[i][2][:7] == " 톡게시판 '":
-                continue
-            if pre_name == new_lines[i][1]:  # 이름이 같으면
-                new_lines[pre_index][2] += " " + new_lines[i][2]  # 내용 연결
-            else:  # 이름이 다르면
-                pre_name = new_lines[i][1]
-                pre_index = i
-                processed_lines.append(new_lines[i])
+    return new_lines
 
-    return processed_lines
+    # pre_name = new_lines[0][1]  # 동일인물이 여러 번 말하면 합치기 위한
+    # pre_index = 0
+    # processed_lines = [new_lines[0]]
+    # for i in range(1, len(new_lines)):
+    #     if new_lines[i][2] != ' ':
+    #         if new_lines[i][2][:7] == " 톡게시판 '":
+    #             continue
+    #         if pre_name == new_lines[i][1]:  # 이름이 같으면
+    #             new_lines[pre_index][2] += " " + new_lines[i][2]  # 내용 연결
+    #         else:  # 이름이 다르면
+    #             pre_name = new_lines[i][1]
+    #             pre_index = i
+    #             processed_lines.append(new_lines[i])
+
+    # return processed_lines
