@@ -13,8 +13,8 @@ parser.add_argument("--match", help="find match of question and answer", action=
 args = parser.parse_args()
 
 
-# kakao_file = "./datas/kakao.txt"
-kakao_file = "./datas/ADE_test_2.txt"
+kakao_file = "./datas/kakao.txt"
+# kakao_file = "./datas/ADE_test_2.txt"
 # kakao_file = "./datas/ADE_test_3.txt"
 already_file = "./datas/already_list.txt"
 place_file = "./datas/place_name.txt"
@@ -26,10 +26,8 @@ match_result_file = "./results/match_result.csv"
 
 def time_report(message, t_time):
     print(message)
-    now = time.time()
-    t_time = int(now - t_time)
+    t_time = int(time.time() - t_time)
     print('{:02d}:{:02d}\n'.format((t_time % 3600) // 60, t_time % 60))
-    return now
 
 def track_name():
     # kakao_file에서 식당명 찾기
@@ -57,15 +55,13 @@ def track_name():
                         manage_file.save_list_as_file(already_file, except_string.get_already_list())
                         manage_file.save_dict_as_json(track_result_file, result_dict)
                         print("count : " + str(count), end=" -> ")
-
-                        
                         print('{:02d}:{:02d}'.format((t_time % 3600) // 60, t_time % 60))
 
     manage_file.save_list_as_file(already_file, except_string.get_already_list())
     manage_file.save_dict_as_json(track_result_file, result_dict)
-    
-    t_time = time_report("식당명 검색 완료", t_time)
-    
+
+    time_report("식당명 검색 완료", t_time)
+
     return processed_lines, result_dict
 
 
@@ -109,10 +105,10 @@ def split_with(pivot, sentences):
 
 def find_match():
     processed_lines, restaurant_dict = track_name()  # kakao_file에서 식당명 찾기
-    
+
     if processed_lines == -1:
         return
-    
+
     restaurant_list = restaurant_dict.keys()  # 검색된 식당명 목록
 
     match_list = []
@@ -197,20 +193,20 @@ def find_match():
                 match_list.append({"name" : name, "time" : open_hours, "sentence" : sentence, "QAN" : "N"})
 
         # 진행 출력
-        if count % 100 == 0 or count % finish_count == 0:
+        if count % 500 == 0 or count % finish_count == 0:
             print("{0:5} / {1:5}".format(count, finish_count))
         count += 1
-        
+
     time_report("QAN 확인 완료", t_time)
 
-    print("QAN 매칭 시작")
-    
+    print("QA 매칭 시작")
+
     # QAN 확인 완료한 문장들 중 QA match 찾기
     match_result = []
     restaurant_data = []
     questioner_list = []
     answerer_list = []
-    
+
     finish_count = len(match_list)
     for i in range(finish_count):
         if match_list[i]["QAN"] == "A":
@@ -264,29 +260,29 @@ def find_match():
                 # 유저 정보 : [이름, 시간, 내용]
                 questioner_list.append([q["name"], q["time"], q["sentence"]])
                 answerer_list.append([a["name"], a["time"], a["sentence"]])
-                
+
         # 진행 출력
-        if i > 0 and (i % 100 == 0 or i % finish_count == 0):
+        if i > 0 and (i % 500 == 0 or i % finish_count == 0):
             print("{0:5} / {1:5}".format(i, finish_count))
-            
-    time_report("QAN 매칭 완료", t_time)
+
+    time_report("QA 매칭 완료", t_time)
 
     # 매칭 결과 출력
-    with open(match_result_file, 'w', encoding='euc-kr') as file:
+    with open(match_result_file, 'w', encoding='utf-8') as file:
         writer = csv.writer(file)
         writer.writerows(match_result)
-        
+
     time_report("매칭 결과 출력", t_time)
 
     # 식당 정보 -> 식당명, 지번, 도로명, 카테고리, 영업시간, 태그
     crawling_place.text_export(restaurant_data)
-    
+
     time_report("식당 정보 출력", t_time)
 
     # 유저 정보 -> 저장
     text_export.question_data(questioner_list)
     text_export.answer_data(answerer_list)
-    
+
     time_report("유저 정보 출력", t_time)
 
 
