@@ -14,7 +14,7 @@ def question_data(question_data_list):
         else:
             name = question_user_data[i][0]
     text_export("Q", question_user_data)
-    
+
 def answer_data(answer_data_list):
     answer_user_data = []
     for i in range(0, len(answer_data_list)):
@@ -37,12 +37,14 @@ def text_export(QNA, user_data):
     data = data.set_index("이름")
 
     if QNA == "Q":
-        data.to_csv('./results/ADE_question_users.csv', encoding='euc-kr')
+        writer = pd.ExcelWriter('./results/ADE_question_users.xlsx', engine='xlsxwriter')
     elif QNA == "A":
-        data.to_csv('./results/ADE_answer_users.csv', encoding='euc-kr')
+        writer = pd.ExcelWriter('./results/ADE_answer_users.xlsx', engine='xlsxwriter')
+
+    data.to_excel(writer, sheet_name='Sheet1')
+    writer.save()
 
 
 if __name__ == '__main__':
     question_data(질문데이터)
     answer_data(답변데이터)
-
