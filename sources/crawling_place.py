@@ -5,19 +5,20 @@ import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 from sources import find_tag
+# import find_tag
 
 def set_data(name, place_list, i):
     # [[식당명, 카테고리, 질문+답변 문장, address][][][][]] (날아옴)
     if name != '':
         time_list = findtime(name)
-        if time_list = "":
+        if time_list == []:
             time_list = " "
-        places_list = findplace(name)  # 장소
+        find_places_list = findplace(name)  # 장소
         # tag = data_divide[3]
         time = ', '.join(time_list)
         new_address = place_list[3]
-        if place_list != "":
-            old_address = places_list[1]
+        if find_places_list != []:
+            old_address = find_places_list[1]
         else : old_address = " "
 
         tag = find_tag.tag_list(place_list[2], place_list[1])
@@ -25,7 +26,6 @@ def set_data(name, place_list, i):
         # 카테고리
 
         word = [name, old_address, new_address, time, tag]  # 이름-시간-내용에 맞춰서 한 배열로 정리
-        print("word: "+str(word))
         return word  # 정리된 형식으로 return
     else:
         return ''
@@ -35,10 +35,8 @@ def text_export(place_list):
     names = []
     for i in range(0, len(place_list)):
         names.append(place_list[i][0])
-    print(names)
     place_data = []
     for name in names:
-        print(name)
         i = names.index(name)
         data = set_data(name, place_list[i], i)
         if data != '':
@@ -63,6 +61,7 @@ def findplace(search):
     for line in par_place:
         placename = line.get_text()
         place.append(placename)
+        
     return place
 
 
