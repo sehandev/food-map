@@ -50,7 +50,7 @@ def track_name():
 
                     count += 1
 
-                    if count % 10 == 0:
+                    if count % 50 == 0:
                         # 결과 중간 저장
                         manage_file.save_list_as_file(already_file, except_string.get_already_list())
                         manage_file.save_dict_as_json(track_result_file, result_dict)
