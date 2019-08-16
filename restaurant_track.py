@@ -69,7 +69,7 @@ def grade_question():
     processed_lines = preprocessing.preprocessing(kakao_file)  # [ [시간1, 이름1, 내용1], [시간2, 이름2, 내용2], ... ]
 
     score_result = []
-    for open_hours, name, sentence in processed_lines:
+    for time_log, name, sentence in processed_lines:
         score, tokens = is_question.grade(sentence)
         score_result.append([score, sentence, tokens])
     score_result.sort(key=lambda x: x[0])
@@ -121,10 +121,10 @@ def find_match():
     t_time = int(time.time())  # 시작 시간
     print("QAN 확인 시작")
 
-    for open_hours, name, sentence in processed_lines:
+    for time_log, name, p_sentence in processed_lines:
 
         # pivot 기준으로 문장 나누기
-        sentences = [sentence]
+        sentences = [p_sentence]
         pivots = ["?", "!"]
         for pivot in pivots:
             sentences = split_with(pivot, sentences)
@@ -158,7 +158,7 @@ def find_match():
                     elif pre_restaurant != "":
                         # 이전에 식당명이 있었으면
                         match, location = answer_check.location_find(restaurant_dict[pre_restaurant], pre_restaurant, places)
-                        match_list.append({"name" : name, "time" : open_hours, "sentence" : sentence, "QAN" : "A", "location" : location, "title" : pre_restaurant, "restaurant" : match})
+                        match_list.append({"name" : name, "time" : time_log, "sentence" : sentence, "QAN" : "A", "location" : location, "title" : pre_restaurant, "restaurant" : match})
 
                         pre_restaurant = noun
                         if location != "":
@@ -168,7 +168,7 @@ def find_match():
             if check == 0:
                 # 식당명이 더 나오지 않아 추가되지 않은 식당명 처리
                 match, location = answer_check.location_find(restaurant_dict[pre_restaurant], pre_restaurant, places)
-                match_list.append({"name" : name, "time" : open_hours, "sentence" : sentence, "QAN" : "A", "location" : location, "title" : pre_restaurant, "restaurant" : match})
+                match_list.append({"name" : name, "time" : time_log, "sentence" : sentence, "QAN" : "A", "location" : location, "title" : pre_restaurant, "restaurant" : match})
 
             if check == 1:
                 # 이 문장이 답변이 아니었으면
@@ -178,11 +178,11 @@ def find_match():
                 category, location = find_inform.find_inform(sentence)  # find_inform는 세연 제작 중
                 if 0.65 <= score:
                     # 확정
-                    match_list.append({"name" : name, "time" : open_hours, "sentence" : sentence, "QAN" : "Q", "location" : location, "category" : category})
+                    match_list.append({"name" : name, "time" : time_log, "sentence" : sentence, "QAN" : "Q", "location" : location, "category" : category})
                     check = 0
                 elif 0.55 <= score < 0.65:
                     # 확인이 필요한 문장
-                    match_list.append({"name" : name, "time" : open_hours, "sentence" : sentence, "QAN" : "QN", "location" : location, "category" : category})
+                    match_list.append({"name" : name, "time" : time_log, "sentence" : sentence, "QAN" : "QN", "location" : location, "category" : category})
                     check = 0
                 elif score < 0.55:
                     # 점수 미달
@@ -190,7 +190,7 @@ def find_match():
 
             if check == 1:
                 # 이 문장이 답변도 질문도 아니었으면
-                match_list.append({"name" : name, "time" : open_hours, "sentence" : sentence, "QAN" : "N"})
+                match_list.append({"name" : name, "time" : time_log, "sentence" : sentence, "QAN" : "N"})
 
         # 진행 출력
         if count % 500 == 0 or count % finish_count == 0:
@@ -211,7 +211,7 @@ def find_match():
     for i in range(finish_count):
         if match_list[i]["QAN"] == "A":
             tmp_question_list = []
-            for j in range(i-10, i):
+            for j in range(i-5, i):
                 if match_list[j]["QAN"] == "Q":
                     # 지역 +10, 식당 순위 -1, 카테고리 +1, 순서 +0.1
                     match_score = -3
