@@ -17,7 +17,7 @@ def set_data(name, place_list, i):
         # tag = data_divide[3]
         time = ', '.join(time_list)
         new_address = place_list[3]
-        if find_places_list != []:
+        if len(find_places_list) == 2:
             old_address = find_places_list[1]
         else : old_address = " "
 
@@ -61,7 +61,7 @@ def findplace(search):
     for line in par_place:
         placename = line.get_text()
         place.append(placename)
-        
+
     return place
 
 
