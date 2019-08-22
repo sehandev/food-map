@@ -1,5 +1,6 @@
 from sources import manage_file
 
+
 def preprocessing(kakao_file):
 
     lines = manage_file.read_file_as_list(kakao_file)
@@ -43,6 +44,10 @@ def preprocessing(kakao_file):
         if line[-10:] == "님을 내보냈습니다.":
             continue
 
+        # 2018. 10. 27. 오후 9:27, 진수성찬 : 톡게시판 '투표': 빕 구르망 투어–교양식사
+        if line.count(" : 톡게시판 \'"):
+            continue
+
         line = line.replace("이모티콘", '')
 
         time_name_log = line.split(',', maxsplit=1)
@@ -50,7 +55,8 @@ def preprocessing(kakao_file):
         # 2018. 8. 18. 오후 6:45, sehan : ㅎㅇ
 
         if len(time_name_log) > 1:
-            time_name_log = [time_name_log[0]] + time_name_log[1].split(' : ', maxsplit=1)
+            time_name_log = [time_name_log[0]] + \
+                time_name_log[1].split(' : ', maxsplit=1)
             time_stamp = time_name_log[0]
             if len(time_stamp) >= 2:
                 if len(time_stamp.split('.')) == 4:
@@ -62,19 +68,3 @@ def preprocessing(kakao_file):
         new_lines[-1][2] += " " + line
 
     return new_lines
-
-    # pre_name = new_lines[0][1]  # 동일인물이 여러 번 말하면 합치기 위한
-    # pre_index = 0
-    # processed_lines = [new_lines[0]]
-    # for i in range(1, len(new_lines)):
-    #     if new_lines[i][2] != ' ':
-    #         if new_lines[i][2][:7] == " 톡게시판 '":
-    #             continue
-    #         if pre_name == new_lines[i][1]:  # 이름이 같으면
-    #             new_lines[pre_index][2] += " " + new_lines[i][2]  # 내용 연결
-    #         else:  # 이름이 다르면
-    #             pre_name = new_lines[i][1]
-    #             pre_index = i
-    #             processed_lines.append(new_lines[i])
-
-    # return processed_lines

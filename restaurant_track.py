@@ -13,8 +13,8 @@ parser.add_argument("--match", help="find match of question and answer", action=
 args = parser.parse_args()
 
 
-# kakao_file = "./datas/kakao.txt"
-kakao_file = "./datas/ADE_test_2.txt"
+kakao_file = "./datas/kakao.txt"
+# kakao_file = "./datas/ADE_test_2.txt"
 # kakao_file = "./datas/ADE_test_3.txt"
 already_file = "./datas/already_list.txt"
 place_file = "./datas/place_name.txt"
@@ -24,9 +24,14 @@ grade_result_file = "./results/grade.txt"
 match_result_file = "./results/match_result.csv"
 
 
+def time_report(message, t_time):
+    print(message)
+    t_time = int(time.time() - t_time)
+    print('{:02d}:{:02d}\n'.format((t_time % 3600) // 60, t_time % 60))
+
 def track_name():
     # kakao_file에서 식당명 찾기
-    t_time = time.time()  # 시작 시간
+    t_time = int(time.time())  # 시작 시간
 
     processed_lines = preprocessing.preprocessing(kakao_file)  # [ [시간1, 이름1, 내용1], [시간2, 이름2, 내용2], ... ]
     result_dict = manage_file.read_json_as_dict(track_result_file)
@@ -39,24 +44,24 @@ def track_name():
                 results = naver_local.check_name(noun, noun)  # 네이버 지도 검색해서 1순위 or 2순위 있으면 return
                 if results == -1:
                     print("네이버 지역 검색 API 할당량을 초과했습니다")
-                    return
+                    return -1, {}
                 elif results != []:
                     result_dict[noun] = results  # 검색결과 추가
 
                     count += 1
 
-                    if count % 10 == 0:
+                    if count % 50 == 0:
                         # 결과 중간 저장
                         manage_file.save_list_as_file(already_file, except_string.get_already_list())
                         manage_file.save_dict_as_json(track_result_file, result_dict)
                         print("count : " + str(count), end=" -> ")
-
-                        t_time = time.time() - t_time
-                        print('{:02d}:{:02d}'.format(int(t_time % 3600 // 60), int(t_time % 60)))
+                        print('{:02d}:{:02d}'.format((t_time % 3600) // 60, t_time % 60))
 
     manage_file.save_list_as_file(already_file, except_string.get_already_list())
     manage_file.save_dict_as_json(track_result_file, result_dict)
-    print("검색 완료")
+
+    time_report("식당명 검색 완료", t_time)
+
     return processed_lines, result_dict
 
 
@@ -64,7 +69,7 @@ def grade_question():
     processed_lines = preprocessing.preprocessing(kakao_file)  # [ [시간1, 이름1, 내용1], [시간2, 이름2, 내용2], ... ]
 
     score_result = []
-    for time, name, sentence in processed_lines:
+    for time_log, name, sentence in processed_lines:
         score, tokens = is_question.grade(sentence)
         score_result.append([score, sentence, tokens])
     score_result.sort(key=lambda x: x[0])
@@ -100,6 +105,10 @@ def split_with(pivot, sentences):
 
 def find_match():
     processed_lines, restaurant_dict = track_name()  # kakao_file에서 식당명 찾기
+
+    if processed_lines == -1:
+        return
+
     restaurant_list = restaurant_dict.keys()  # 검색된 식당명 목록
 
     match_list = []
@@ -108,10 +117,14 @@ def find_match():
 
     place_list = manage_file.read_file_as_list(place_file)
 
-    for time, name, sentence in processed_lines:
+
+    t_time = int(time.time())  # 시작 시간
+    print("QAN 확인 시작")
+
+    for time_log, name, p_sentence in processed_lines:
 
         # pivot 기준으로 문장 나누기
-        sentences = [sentence]
+        sentences = [p_sentence]
         pivots = ["?", "!"]
         for pivot in pivots:
             sentences = split_with(pivot, sentences)
@@ -145,7 +158,7 @@ def find_match():
                     elif pre_restaurant != "":
                         # 이전에 식당명이 있었으면
                         match, location = answer_check.location_find(restaurant_dict[pre_restaurant], pre_restaurant, places)
-                        match_list.append({"name" : name, "time" : time, "sentence" : sentence, "QAN" : "A", "location" : location, "title" : pre_restaurant, "restaurant" : match})
+                        match_list.append({"name" : name, "time" : time_log, "sentence" : sentence, "QAN" : "A", "location" : location, "title" : pre_restaurant, "restaurant" : match})
 
                         pre_restaurant = noun
                         if location != "":
@@ -155,7 +168,7 @@ def find_match():
             if check == 0:
                 # 식당명이 더 나오지 않아 추가되지 않은 식당명 처리
                 match, location = answer_check.location_find(restaurant_dict[pre_restaurant], pre_restaurant, places)
-                match_list.append({"name" : name, "time" : time, "sentence" : sentence, "QAN" : "A", "location" : location, "title" : pre_restaurant, "restaurant" : match})
+                match_list.append({"name" : name, "time" : time_log, "sentence" : sentence, "QAN" : "A", "location" : location, "title" : pre_restaurant, "restaurant" : match})
 
             if check == 1:
                 # 이 문장이 답변이 아니었으면
@@ -165,11 +178,11 @@ def find_match():
                 category, location = find_inform.find_inform(sentence)  # find_inform는 세연 제작 중
                 if 0.65 <= score:
                     # 확정
-                    match_list.append({"name" : name, "time" : time, "sentence" : sentence, "QAN" : "Q", "location" : location, "category" : category})
+                    match_list.append({"name" : name, "time" : time_log, "sentence" : sentence, "QAN" : "Q", "location" : location, "category" : category})
                     check = 0
                 elif 0.55 <= score < 0.65:
                     # 확인이 필요한 문장
-                    match_list.append({"name" : name, "time" : time, "sentence" : sentence, "QAN" : "QN", "location" : location, "category" : category})
+                    match_list.append({"name" : name, "time" : time_log, "sentence" : sentence, "QAN" : "QN", "location" : location, "category" : category})
                     check = 0
                 elif score < 0.55:
                     # 점수 미달
@@ -177,22 +190,28 @@ def find_match():
 
             if check == 1:
                 # 이 문장이 답변도 질문도 아니었으면
-                match_list.append({"name" : name, "time" : time, "sentence" : sentence, "QAN" : "N"})
+                match_list.append({"name" : name, "time" : time_log, "sentence" : sentence, "QAN" : "N"})
 
         # 진행 출력
-        if count % 100 == 0 or count % finish_count == 0:
+        if count % 500 == 0 or count % finish_count == 0:
             print("{0:5} / {1:5}".format(count, finish_count))
         count += 1
+
+    time_report("QAN 확인 완료", t_time)
+
+    print("QA 매칭 시작")
 
     # QAN 확인 완료한 문장들 중 QA match 찾기
     match_result = []
     restaurant_data = []
     questioner_list = []
     answerer_list = []
-    for i in range(len(match_list)):
+
+    finish_count = len(match_list)
+    for i in range(finish_count):
         if match_list[i]["QAN"] == "A":
             tmp_question_list = []
-            for j in range(i-10, i):
+            for j in range(i-5, i):
                 if match_list[j]["QAN"] == "Q":
                     # 지역 +10, 식당 순위 -1, 카테고리 +1, 순서 +0.1
                     match_score = -3
@@ -242,17 +261,29 @@ def find_match():
                 questioner_list.append([q["name"], q["time"], q["sentence"]])
                 answerer_list.append([a["name"], a["time"], a["sentence"]])
 
+        # 진행 출력
+        if i > 0 and (i % 500 == 0 or i % finish_count == 0):
+            print("{0:5} / {1:5}".format(i, finish_count))
+
+    time_report("QA 매칭 완료", t_time)
+
     # 매칭 결과 출력
-    with open(match_result_file, 'w', encoding='euc-kr') as file:
+    with open(match_result_file, 'w', encoding='utf-8') as file:
         writer = csv.writer(file)
         writer.writerows(match_result)
+
+    time_report("매칭 결과 출력", t_time)
 
     # 식당 정보 -> 식당명, 지번, 도로명, 카테고리, 영업시간, 태그
     crawling_place.text_export(restaurant_data)
 
+    time_report("식당 정보 출력", t_time)
+
     # 유저 정보 -> 저장
     text_export.question_data(questioner_list)
     text_export.answer_data(answerer_list)
+
+    time_report("유저 정보 출력", t_time)
 
 
 if __name__ == "__main__":
