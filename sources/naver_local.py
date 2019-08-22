@@ -71,6 +71,7 @@ def is_restaurant(query, pivot):
         title = item["title"].replace(" ", "")  # 공백제거한 식당명
         category = item["category"]  # 카테고리 (대분류 > 소분류)
         road_address = item["roadAddress"]  # 도로명
+        link = item["link"]
         if category.split('>')[0] in categories:  # 카테고리 대분류가
 
             bolds = []  # 검색어와 겹치는 단어들
@@ -93,7 +94,7 @@ def is_restaurant(query, pivot):
 
             # 1단계 : query(검색어)와 동일한 title
             if similar_score == 1.0 and len(lefts) == 0:  # 검색어만 있을 때
-                results[0].append({"title": origin_title, "category": category, "address": road_address})
+                results[0].append({"title": origin_title, "category": category, "address": road_address, "link": link})
 
             # 2단계 : 동일 title + 다른 단어
             elif similar_score == 1.0 and len(lefts) > 0:
@@ -103,11 +104,11 @@ def is_restaurant(query, pivot):
                     if left in tmp:
                         t = tmp.index(left)
                         break
-                results[1].append([{"title": origin_title, "category": category, "address": road_address}, t])
+                results[1].append([{"title": origin_title, "category": category, "address": road_address, "link": link}, t])
 
             # 3단계 : 유사 title
             else:
-                results[2].append([{"title": origin_title, "category": category, "address": road_address}, similar_score])
+                results[2].append([{"title": origin_title, "category": category, "address": road_address, "link": link}, similar_score])
 
     results[1].sort(key=lambda x: x[1])
     for i in range(len(results[1])):
@@ -131,22 +132,6 @@ def is_restaurant(query, pivot):
     return results, check
 
 
-def print_result(count, results, index):
-    length = len(results[index])
-    if length == 0:
-        print(str(index + 1) + "순위 결과 없음")
-        pass
-    elif count - length > 0:
-        print(str(index + 1) + "순위")
-        print(*results[index], sep="\n")
-        count -= length
-    else:
-        print(str(index + 1) + "순위")
-        print(*results[index][:count], sep="\n")
-
-    return count
-
-
 def check_name(query, pivot):
     # 네이버 지도 검색해서 1순위 or 2순위 있으면 return
     results, check = is_restaurant(query, pivot)  # 검색결과에서 1(검색어와 동일한 식당명), 2(동일 식당명 + a) 찾기
@@ -166,11 +151,6 @@ def check_name(query, pivot):
     elif check == 3:
         # 식당 이름인 경우
         return results
-
-        # 1순위, 2순위, 3순위 출력
-        # count = 6
-        # for i in range(3):
-        #     count = print_result(count, results, i)
     else:
         # 알 수 없는 경우
         print("비정상 check 발견")
