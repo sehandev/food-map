@@ -30,15 +30,14 @@ def set_data(place_list):
 
         # 카테고리
 
-        word = [name, old_address, new_address,
-                time, tag]  # 이름-시간-내용에 맞춰서 한 배열로 정리
+        word = [name, old_address, new_address, time, tag]  # 이름-시간-내용에 맞춰서 한 배열로 정리
         return word  # 정리된 형식으로 return
     else:
         return ''
 
 
 def text_export(place_lists):
-    # [[식당명, 카테고리, 질문+답변 문장, address][][][][]] (날아옴)
+    # 식당 정보가 담긴 이중배열 처리
     place_data = []
     for place_list in place_lists:
         data = set_data(place_list)
