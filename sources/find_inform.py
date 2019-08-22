@@ -1,4 +1,4 @@
-with open("./datas/food_list.txt", 'r') as file:
+with open("./datas/food_list.txt", 'r') as file:  
     str = file.read()
     food_list = str.split("\n")
     food_list = list(set(food_list))
@@ -11,13 +11,13 @@ with open("./datas/subway_station.txt", 'r') as file3:
     place_name.extend(subway_name)
 
 
-def making_divide_list():
+def making_divide_list():   # food-list를 - 기준으로 category별로 list로 묶어 분류
     food_list_middle = []
     food_list_middle_two = []
     for i in range(0, 8):
         word = food_list2[i]
         food_list_middle = word.split("\n")
-        if food_list_middle[0] == '':
+        if food_list_middle[0] == '':  # 처음, 끝 정보 없을경우 제거
             del food_list_middle[0]
         if food_list_middle[-1] == '':
             del food_list_middle[-1]
@@ -32,7 +32,7 @@ def food_category(food_name):
     for j in range(0, 8):
         for k in range(0, len(category_list[j])):
             if food_name == category_list[j][k]:
-                food_category = category_list[j][0]
+                food_category = category_list[j][0]  # category-list의 첫번째 원소들이 category
     return food_category
 
 
@@ -57,5 +57,3 @@ def find_inform(sentence):
 
 if __name__ == "__main__":
     category, place = find_inform("광화문에 한식 특히 고기맛집 있나요?")
-    print(category)
-    print(place)
