@@ -1,4 +1,4 @@
-from sources import preprocessing, find_name, except_string, naver_local, manage_file, is_question, find_inform, answer_check, category_regularation, crawling_place, text_export
+from sources import preprocessing, find_noun, except_string, naver_local, manage_file, is_question, find_inform, answer_check, category_regularation, crawling_place, text_export
 import time
 import signal
 import pathlib
@@ -15,10 +15,10 @@ args = parser.parse_args()
 
 # data file
 kakao_file = "./datas/kakao.txt"
-already_file = "./datas/already_list.txt"
 place_file = "./datas/place_name.txt"
 
 # result file
+already_file = "./results/already_list.txt"
 track_result_file = "./results/restaurant.json"
 grade_result_file = "./results/grade.txt"
 match_result_file = "./results/match_result.csv"

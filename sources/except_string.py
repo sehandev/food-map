@@ -1,7 +1,7 @@
 from sources import manage_file
 
 josa_file = "./datas/josa_list.txt"
-already_file = "./datas/already_list.txt"
+already_file = "./results/already_list.txt"
 unit_file = "./datas/unit_list.txt"
 
 josa_list = manage_file.read_file_as_list(josa_file)  # 조사
