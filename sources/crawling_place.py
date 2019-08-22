@@ -10,7 +10,7 @@ from sources import find_tag
 def set_data(place_list):
     name = place_list[0]
     if name != '':
-        url = "https://search.naver.com/search.naver?sm=top_hty&fbm=1&ie=utf8&query=" + name
+        url = place_list[4]
         html = requests.get(url)
         soup = BeautifulSoup(html.text, "html.parser")
 
@@ -18,7 +18,6 @@ def set_data(place_list):
         if time_list == []:
             time_list = " "
         find_places_list = findplace(soup)  # 장소
-        # tag = data_divide[3]
         time = ', '.join(time_list)
         new_address = place_list[3]
         if len(find_places_list) == 2:
@@ -53,8 +52,7 @@ def text_export(place_lists):
         data = data.set_index("식당명")
         dup_remove_data = data.drop_duplicates('위치', keep='first')
         
-        writer = pd.ExcelWriter(
-            './results/ADE_place.xlsx', engine='xlsxwriter')
+        writer = pd.ExcelWriter('./results/ADE_place.xlsx', engine='xlsxwriter')
         data.to_excel(writer, sheet_name='Sheet1')
         writer.save()
 
@@ -71,12 +69,7 @@ def findplace(soup):
 
 
 def findtime(soup):
-    # par_restaurants = soup.findAll("a", attrs={"class": "biz_name"}
     par_time = soup.findAll("span", attrs={"class": "time"})
-    #
-    # restaurant_data = []
-    # restaurant_data.append(par_restaurants[0].get_text())
-    # print(restaurant_data)
 
     all_time = []
     for line3 in par_time:
