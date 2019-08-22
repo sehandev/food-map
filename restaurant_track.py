@@ -43,7 +43,7 @@ def track_name():
     count = 1
     finish_count = len(processed_lines)
     for sentence in processed_lines:
-        nouns = find_name.kakao_log_to_nouns(sentence[2])  # 내용에서 명사 찾기 (띄어쓰기, 명사, 조사)
+        nouns = find_noun.kakao_log_to_nouns(sentence[2])  # 내용에서 명사 찾기 (띄어쓰기, 명사, 조사)
         for noun in nouns:
             if not except_string.except_string(noun):  # 제외 : 3글자 미만, 숫자, 숫자+단위, 블랙리스트, 검색기록 있음
                 results = naver_local.check_name(noun, noun)  # 네이버 지도 검색해서 1순위 or 2순위 있으면 return
@@ -148,7 +148,7 @@ def find_match():
             # 나눠진 문장에 대해서
 
             # 답변 찾기
-            nouns = find_name.kakao_log_to_nouns(sentence)
+            nouns = find_noun.kakao_log_to_nouns(sentence)
             if sentence.count("샵검색") > 0:
                 tmp_sentence = sentence.split("샵검색: #")[-1]
                 if len(tmp_sentence.split()) > 1:
