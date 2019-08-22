@@ -24,7 +24,6 @@ def answer_data(answer_data_list):
             answer_user_data.append(parse)
     
     answer_user_data.sort(key=lambda x: x[0])
-    print(answer_user_data)
     name = answer_user_data[0][0]
     for i in range(1, len(answer_user_data)):  # 중복된 이름이면 지워주고 넘기는 것
         if name in answer_user_data[i][0]:
