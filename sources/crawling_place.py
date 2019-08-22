@@ -43,13 +43,17 @@ def text_export(place_lists):
     for place_list in place_lists:
         data = set_data(place_list)
         if data != '':
-            place_data.append(data)
+            if data in place_data: 
+                pass
+            else:
+                place_data.append(data)
 
     if place_data != []:
         data = pd.DataFrame(place_data)
         data.columns = ['식당명', '지번', '위치', '영업시간', '태그']
         data = data.set_index("식당명")
-
+        dup_remove_data = data.drop_duplicates('위치', keep='first')
+        
         writer = pd.ExcelWriter(
             './results/ADE_place.xlsx', engine='xlsxwriter')
         data.to_excel(writer, sheet_name='Sheet1')
@@ -85,7 +89,7 @@ def findtime(soup):
 def main():
     # [[식당명, 카테고리, 질문+답변 문장][][][][]] (날아옴)
     # place_list = []
-    text_export(place_list)
+    text_export(place_lists)
 
 
 if __name__ == '__main__':
