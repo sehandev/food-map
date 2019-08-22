@@ -11,13 +11,16 @@ unit_list = manage_file.read_file_as_list(unit_file)  # 단위
 except_file = "./datas/except_list.txt"
 food_file = "./datas/food_list.txt"
 subway_file = "./datas/subway_station.txt"
+place_file = "./datas/place_name.txt"
 
 except_list = manage_file.read_file_as_list(except_file)  # 사용자 제작
 subway_list = manage_file.read_file_as_list(subway_file)  # 지하철 역명
 food_list = manage_file.read_file_as_list(food_file)  # 음식 이름
+place_list = manage_file.read_file_as_list(place_file)  # 지역명
 
 except_list.extend(subway_list)
 except_list.extend(food_list)
+except_list.extend(place_list)
 
 
 def except_string(query):
