@@ -10,7 +10,7 @@ from sources import find_tag
 def set_data(place_list):
     name = place_list[0]
     if name != '':
-        url = place_list[4]
+        url = "https://search.naver.com/search.naver?sm=top_hty&fbm=1&ie=utf8&query=" + name
         html = requests.get(url)
         soup = BeautifulSoup(html.text, "html.parser")
 
