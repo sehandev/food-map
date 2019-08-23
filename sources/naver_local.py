@@ -71,7 +71,6 @@ def is_restaurant(query, pivot):
         title = item["title"].replace(" ", "")  # 공백제거한 식당명
         category = item["category"]  # 카테고리 (대분류 > 소분류)
         road_address = item["roadAddress"]  # 도로명
-        link = item["link"]
         if category.split('>')[0] in categories:  # 카테고리 대분류가
 
             bolds = []  # 검색어와 겹치는 단어들
@@ -94,7 +93,7 @@ def is_restaurant(query, pivot):
 
             # 1단계 : query(검색어)와 동일한 title
             if similar_score == 1.0 and len(lefts) == 0:  # 검색어만 있을 때
-                results[0].append({"title": origin_title, "category": category, "address": road_address, "link": link})
+                results[0].append({"title": origin_title, "category": category, "address": road_address})
 
             # 2단계 : 동일 title + 다른 단어
             elif similar_score == 1.0 and len(lefts) > 0:
@@ -104,11 +103,11 @@ def is_restaurant(query, pivot):
                     if left in tmp:
                         t = tmp.index(left)
                         break
-                results[1].append([{"title": origin_title, "category": category, "address": road_address, "link": link}, t])
+                results[1].append([{"title": origin_title, "category": category, "address": road_address}, t])
 
             # 3단계 : 유사 title
             else:
-                results[2].append([{"title": origin_title, "category": category, "address": road_address, "link": link}, similar_score])
+                results[2].append([{"title": origin_title, "category": category, "address": road_address}, similar_score])
 
     results[1].sort(key=lambda x: x[1])
     for i in range(len(results[1])):
