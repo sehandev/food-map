@@ -6,10 +6,8 @@ import base64
 import sys
 import os
 from difflib import SequenceMatcher
-from sources import manage_file
+from sources import datas
 
-category_file = "./datas/category_list.txt"
-categories = manage_file.read_file_as_list(category_file)  # 카테고리 대분류 중 식당 목록
 
 검색결과수 = "10"
 검색시작위치 = "1"
@@ -71,7 +69,7 @@ def is_restaurant(query, pivot):
         title = item["title"].replace(" ", "")  # 공백제거한 식당명
         category = item["category"]  # 카테고리 (대분류 > 소분류)
         road_address = item["roadAddress"]  # 도로명
-        if category.split('>')[0] in categories:  # 카테고리 대분류가
+        if category.split('>')[0] in datas.category_list:  # 카테고리 대분류가
 
             bolds = []  # 검색어와 겹치는 단어들
             lefts = []  # 검색어와 겹치지 않는 단어들
