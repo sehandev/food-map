@@ -73,7 +73,7 @@ def grade_question():
     for time_log, name, sentence in processed_lines:
         score, tokens = is_question.grade(sentence)
         score_result.append([score, sentence, tokens])
-    score_result.sort(key=lambda x: x[0])
+    score_result.sort(key=lambda x: x[0], reverse=True)
 
     datas.save_grade(score_result)
 
