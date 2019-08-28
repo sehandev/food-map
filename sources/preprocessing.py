@@ -1,11 +1,9 @@
-from sources import manage_file
+from sources import datas
 
 
-def preprocessing(kakao_file):
-
-    lines = manage_file.read_file_as_list(kakao_file)
+def preprocessing():
     new_lines = []  # 새롭게 작성할 문서
-    for line in lines[2:]:
+    for line in datas.kakao_log[2:]:
 
         # 빈 줄 제거
         if line == "":

@@ -9,7 +9,7 @@ def read_file_as_list(file_name):
         return lines
     else:
         print("There is no [ " + file_name.split('/')[-1] + " ]")
-        print("Return empty list")
+        print("Return empty list\n")
         return []
 
 
@@ -26,7 +26,7 @@ def read_json_as_dict(file_name):
         return dict
     else:
         print("There is no [ " + file_name.split('/')[-1] + " ]")
-        print("Return empty dict")
+        print("Return empty dict\n")
         return {}
 
 
@@ -47,5 +47,5 @@ def read_txt_as_dict(file_name):
             return tmp_dict
     else:
         print("There is no [ " + file_name.split('/')[-1] + " ]")
-        print("Return empty dict")
+        print("Return empty dict\n")
         return {}
