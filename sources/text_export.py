@@ -1,4 +1,5 @@
 import pandas as pd
+from sources import crawling_place
 
 #파일 송출
 
@@ -8,7 +9,7 @@ def question_data(question_data_list):  #질문 데이터 처리
         parse = question_data_list[i]
         if question_data_list[i][2] != question_data_list[i-1][2]:  # question_data_list의 내용이 이전의 내용과 다를 경우에만 append
             question_user_data.append(parse)
-        
+
     question_user_data.sort(key=lambda x: x[0])  # append한 데이터에 대해서 이름 기준으로 정렬
     name = question_user_data[0][0]
     for i in range(1, len(question_user_data)):  # 중복된 이름이면 지워주고 넘기는 것(가독성을 위해. 추후 이름이 함께 넘어와야할 때 for 지우면 됨)
@@ -16,7 +17,7 @@ def question_data(question_data_list):  #질문 데이터 처리
             question_user_data[i][0] = question_user_data[i][0].replace(name, "")
         else:
             name = question_user_data[i][0]
-    text_export("Q", question_user_data)  #Q 
+    text_export("Q", question_user_data)  #Q
 
 def answer_data(answer_data_list):
     answer_user_data = []
@@ -24,7 +25,7 @@ def answer_data(answer_data_list):
         parse = answer_data_list[i]
         if answer_data_list[i][2] != answer_data_list[i-1][2]:  # answer_data_list의 내용이 이전 내용과 다를 경우에만 append
             answer_user_data.append(parse)
-    
+
     answer_user_data.sort(key=lambda x: x[0])  # append한 데이터에 대해서 이름 기준 정렬
     name = answer_user_data[0][0]
     for i in range(1, len(answer_user_data)):  # 중복된 이름이면 지워주고 넘기는 것
@@ -47,6 +48,27 @@ def text_export(QNA, user_data):
 
     data.to_excel(writer, sheet_name='Sheet1')
     writer.save()
+
+def place_export(place_lists):
+    # 식당 정보가 담긴 이중배열 처리
+    place_data = []
+    for place_list in place_lists:
+        data = crawling_place.set_data(place_list)
+        if data != '':
+            if data in place_data:
+                pass
+            else:
+                place_data.append(data)
+
+    if place_data != []:
+        data = pd.DataFrame(place_data)
+        data.columns = ['식당명', '지번', '위치', '영업시간', '태그']
+        data = data.set_index("식당명")
+        dup_remove_data = data.drop_duplicates('위치', keep='first')
+
+        writer = pd.ExcelWriter('./results/ADE_place.xlsx', engine='xlsxwriter')
+        data.to_excel(writer, sheet_name='Sheet1')
+        writer.save()
 
 
 if __name__ == '__main__':

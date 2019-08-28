@@ -1,20 +1,7 @@
 import re
-from sources import manage_file
-from twkorean import TwitterKoreanProcessor
+from sources import datas
 
-processor = TwitterKoreanProcessor()
 hangul = re.compile("[^ !?0-9가-힣]+")
-
-keyword_file = "./datas/question_keywords.txt"
-restaurant_file = "./results/restaurant.json"
-food_file = "./datas/food_list.txt"
-place_file = "./datas/place_name.txt"
-
-keyword_dict = manage_file.read_txt_as_dict(keyword_file)
-keyword_list = list(keyword_dict.keys())
-place_list = manage_file.read_file_as_list(place_file)
-rastuarant_list = manage_file.read_json_as_dict(restaurant_file).keys()
-food_list = manage_file.read_file_as_list(food_file)
 
 
 def combine_tag(word):
@@ -23,36 +10,24 @@ def combine_tag(word):
     return word
 
 
-def get_tokens(line):
-    tokens = processor.tokenize_to_strings(line)
-
-    for i in range(len(tokens)):
-        tokens[i] = combine_tag(tokens[i])
-
-    return tokens
-
-
 def grade(line):
     score = 0
     count = 0
 
     line = hangul.sub(" ", line)  # 기호(!?), 한글, 숫자만 남기기
-    for place in place_list:
+    for place in datas.place_list:
         line = line.replace(place, "지역")
-    for rastuarant in rastuarant_list:
-        line = line.replace(rastuarant, "이름")
-    for food in food_list:
+    for restaurant in datas.restaurant_list:
+        line = line.replace(restaurant, "이름")
+    for food in datas.food_list:
         line = line.replace(food, "음식")
-    tokens = get_tokens(line)
+    tokens = line.split()
 
-    # if not '?' in tokens:
-    #     score = -1
-    # else:
-    already_check = [0 for i in range(len(keyword_list))]
+    already_check = [0 for i in range(len(datas.keyword_list))]
     for token in tokens:
-        for i in range(len(keyword_list)):
-            if token == keyword_list[i]:
-                already_check[i] = float(keyword_dict[token])
+        for i in range(len(datas.keyword_list)):
+            if token == datas.keyword_list[i]:
+                already_check[i] = float(datas.keyword_dict[token])
 
     for check in already_check:
         if check > 0:

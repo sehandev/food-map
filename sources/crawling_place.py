@@ -1,9 +1,5 @@
-from twkorean import TwitterKoreanProcessor
-import time
-import re
 import requests
 from bs4 import BeautifulSoup
-import pandas as pd
 from sources import find_tag
 
 
@@ -17,13 +13,15 @@ def set_data(place_list):
         time_list = findtime(soup)
         if time_list == []:
             time_list = " "
-        find_places_list = findplace(soup)  # 장소
+        find_places_list = findplace(soup)  # 지번
         time = ', '.join(time_list)
-        new_address = place_list[3]
+        new_address = place_list[3]  # 도로명
         if len(find_places_list) == 2:
             old_address = find_places_list[1]
         else:
             old_address = " "
+
+        price = findprice(soup)  # 평균 가격
 
         tag = find_tag.tag_list(place_list[2], place_list[1])
 
@@ -35,28 +33,6 @@ def set_data(place_list):
         return ''
 
 
-def text_export(place_lists):
-    # 식당 정보가 담긴 이중배열 처리
-    place_data = []
-    for place_list in place_lists:
-        data = set_data(place_list)
-        if data != '':
-            if data in place_data: 
-                pass
-            else:
-                place_data.append(data)
-
-    if place_data != []:
-        data = pd.DataFrame(place_data)
-        data.columns = ['식당명', '지번', '위치', '영업시간', '태그']
-        data = data.set_index("식당명")
-        dup_remove_data = data.drop_duplicates('위치', keep='first')
-        
-        writer = pd.ExcelWriter('./results/ADE_place.xlsx', engine='xlsxwriter')
-        data.to_excel(writer, sheet_name='Sheet1')
-        writer.save()
-
-
 def findplace(soup):
     par_place = soup.findAll("span", attrs={"class": "addr"})
     place = []
@@ -66,6 +42,22 @@ def findplace(soup):
         place.append(placename)
 
     return place
+
+
+def findprice(soup):
+    par_price = soup.findAll("em", attrs={"class": "price"})
+    prices = []
+
+    for line in par_price:
+        price_t = int(line.get_text().replace("원", "").replace(",", ""))
+        prices.append(price_t)
+
+    if prices == []:
+        price = 0
+    else:
+        price = sum(prices) / len(prices)
+
+    return price
 
 
 def findtime(soup):
