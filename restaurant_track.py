@@ -1,4 +1,4 @@
-from sources import preprocessing, find_noun, except_string, naver_local, is_question, find_inform, answer_check, category_regularation, crawling_place, text_export, datas
+from sources import preprocessing, find_noun, except_string, naver_local, is_question, find_inform, answer_check, category_regularation, crawling_place, text_export, datas, tag_list
 import time
 import signal
 import pathlib
@@ -203,6 +203,8 @@ def find_match():
     restaurant_data = []
     questioner_list = []
     answerer_list = []
+    temp_question_tag_list = []
+    temp_answer_tag_list = []
 
     finish_count = len(match_list)
     for i in range(finish_count):
@@ -210,7 +212,7 @@ def find_match():
             tmp_question_list = []  # match 후보
             for j in range(i - 5, i):  # 위로 5문장 확인
                 if match_list[j]["QAN"] == "Q":  # Q가 있으면
-                    # 지역 +10, 식당 순위 -1, 카테고리 +1, 순서 +0.1
+                    # 지역 +2, 식당 순위 -1, 카테고리 +1, 순서 +0.1, 태그 +1
                     match_score = -3
 
                     match = match_list[i]["restaurant"]
@@ -222,16 +224,24 @@ def find_match():
                             location_score = 2
 
                         match, _ = answer_check.location_find(match, match_list[i]["title"], location)  # 지역명과 함께 검색해서 우선순위 변경
+                        
 
                     for grade in range(3):
                         for restaurant in match[grade]:
                             a_category = category_regularation.find_category(restaurant["category"])
                             category_score = 0
+                            tag_score = 0
                             for q_category in match_list[j]["category"]:
+                              temp_question_tag_list = tag_list(match_list[j]["sentence"], q_category)
+                              for tags in temp_question_tag_list:
+                                  tags = tags.replace("#", " ").strip()
+                                  if tags in match_list[i]["sentence"]:
+                                      tag_score = tag_score + 1
                                 if a_category == q_category:
                                     category_score = 1
+                                
 
-                            new_score = location_score - grade + category_score + (j * 0.1)
+                            new_score = location_score - grade + category_score + (j * 0.1) + tag_score
                             if match_score < new_score:
                                 match_score = new_score
                                 highest_restaurant = restaurant
