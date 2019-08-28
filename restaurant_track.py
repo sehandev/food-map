@@ -228,7 +228,6 @@ def find_match():
     finish_count = len(match_list)
     for i in range(finish_count):
         if match_list[i]["QAN"] == "A":  # A를 기준으로
-            tag_score = 0
             tmp_question_list = []  # match 후보
             for j in range(i - 5, i):  # 위로 5문장 확인
                 if match_list[j]["QAN"] == "Q":  # Q가 있으면
@@ -250,6 +249,7 @@ def find_match():
                         for restaurant in match[grade]:
                             a_category = category_regularation.find_category(restaurant["category"])
                             category_score = 0
+                            tag_score = 0
                             for q_category in match_list[j]["category"]:
                               temp_question_tag_list = tag_list(match_list[j]["sentence"], q_category)
                               for tags in temp_question_tag_list:
@@ -259,7 +259,6 @@ def find_match():
                                 if a_category == q_category:
                                     category_score = 1
                                 
-                            
 
                             new_score = location_score - grade + category_score + (j * 0.1) + tag_score
                             if match_score < new_score:
