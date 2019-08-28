@@ -1,4 +1,4 @@
-from sources import preprocessing, find_noun, except_string, naver_local, manage_file, is_question, find_inform, answer_check, category_regularation, crawling_place, text_export
+from sources import preprocessing, find_noun, except_string, naver_local, manage_file, is_question, find_inform, answer_check, category_regularation, crawling_place, text_export, tag_list
 import time
 import signal
 import pathlib
@@ -191,6 +191,7 @@ def find_match():
                 # 질문 찾기
                 score, tokens = is_question.grade(sentence)
                 category, location = find_inform.find_inform(sentence)  # find_inform는 세연 제작 중
+                
                 if 0.65 <= score:
                     # 확정
                     match_list.append({"name": name, "time": time_log, "sentence": sentence, "QAN": "Q", "location": location, "category": category})
@@ -221,14 +222,17 @@ def find_match():
     restaurant_data = []
     questioner_list = []
     answerer_list = []
+    temp_question_tag_list = []
+    temp_answer_tag_list = []
 
     finish_count = len(match_list)
     for i in range(finish_count):
         if match_list[i]["QAN"] == "A":  # A를 기준으로
+            tag_score = 0
             tmp_question_list = []  # match 후보
             for j in range(i - 5, i):  # 위로 5문장 확인
                 if match_list[j]["QAN"] == "Q":  # Q가 있으면
-                    # 지역 +10, 식당 순위 -1, 카테고리 +1, 순서 +0.1
+                    # 지역 +2, 식당 순위 -1, 카테고리 +1, 순서 +0.1, 태그 +1
                     match_score = -3
 
                     match = match_list[i]["restaurant"]
@@ -240,16 +244,24 @@ def find_match():
                             location_score = 2
 
                         match, _ = answer_check.location_find(match, match_list[i]["title"], location)  # 지역명과 함께 검색해서 우선순위 변경
+                        
 
                     for grade in range(3):
                         for restaurant in match[grade]:
                             a_category = category_regularation.find_category(restaurant["category"])
                             category_score = 0
                             for q_category in match_list[j]["category"]:
+                              temp_question_tag_list = tag_list(match_list[j]["sentence"], q_category)
+                              for tags in temp_question_tag_list:
+                                  tags = tags.replace("#", " ").strip()
+                                  if tags in match_list[i]["sentence"]:
+                                      tag_score = tag_score + 1
                                 if a_category == q_category:
                                     category_score = 1
+                                
+                            
 
-                            new_score = location_score - grade + category_score + (j * 0.1)
+                            new_score = location_score - grade + category_score + (j * 0.1) + tag_score
                             if match_score < new_score:
                                 match_score = new_score
                                 highest_restaurant = restaurant
