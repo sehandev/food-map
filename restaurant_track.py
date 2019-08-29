@@ -1,4 +1,4 @@
-from sources import preprocessing, find_noun, except_string, naver_local, is_question, find_inform, answer_check, category_regularation, crawling_place, text_export, datas, tag_list
+from sources import preprocessing, find_noun, except_string, naver_local, is_question, find_inform, answer_check, category_regularation, crawling_place, text_export, datas, find_tag
 import time
 import signal
 import pathlib
@@ -73,7 +73,7 @@ def grade_question():
     for time_log, name, sentence in processed_lines:
         score, tokens = is_question.grade(sentence)
         score_result.append([score, sentence, tokens])
-    score_result.sort(key=lambda x: x[0])
+    score_result.sort(key=lambda x: x[0], reverse=True)
 
     datas.save_grade(score_result)
 
@@ -224,7 +224,7 @@ def find_match():
                             location_score = 2
 
                         match, _ = answer_check.location_find(match, match_list[i]["title"], location)  # 지역명과 함께 검색해서 우선순위 변경
-                        
+
 
                     for grade in range(3):
                         for restaurant in match[grade]:
@@ -232,14 +232,14 @@ def find_match():
                             category_score = 0
                             tag_score = 0
                             for q_category in match_list[j]["category"]:
-                              temp_question_tag_list = tag_list(match_list[j]["sentence"], q_category)
-                              for tags in temp_question_tag_list:
-                                  tags = tags.replace("#", " ").strip()
-                                  if tags in match_list[i]["sentence"]:
-                                      tag_score = tag_score + 1
+                                temp_question_tag_list = find_tag.tag_list(match_list[j]["sentence"], q_category)
+                                for tags in temp_question_tag_list:
+                                    tags = tags.replace("#", "").strip()
+                                    if tags in match_list[i]["sentence"]:
+                                        tag_score = tag_score + 1
                                 if a_category == q_category:
                                     category_score = 1
-                                
+
 
                             new_score = location_score - grade + category_score + (j * 0.1) + tag_score
                             if match_score < new_score:
