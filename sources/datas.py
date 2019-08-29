@@ -2,8 +2,8 @@ from sources import manage_file
 import csv
 
 # data file
-# kakao = "./datas/kakao.txt"
-kakao = "./datas/ADE_test_2.txt"
+kakao = "./datas/kakao.txt"
+# kakao = "./datas/ADE_test_2.txt"
 keyword = "./datas/question_keywords.txt"
 food = "./datas/food_list.txt"
 place = "./datas/place_name.txt"
@@ -32,7 +32,7 @@ except_list.extend(subway_list)
 
 
 def load_food():
-    with open(food, 'r') as file:
+    with open(food, 'r', encoding='utf-8') as file:
         tmp_list = file.read().split("-")
 
         food_list_middle = []
@@ -73,7 +73,7 @@ def save_restaurant():
 
 
 def save_grade(score_result):
-    with open(grade, 'w') as file:
+    with open(grade, 'w', encoding='utf-8') as file:
         for score, sentence, tokens in score_result:
             file.write(str(score) + " : ")
             file.write("{0:100}".format(sentence))
