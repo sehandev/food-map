@@ -53,8 +53,7 @@ def preprocessing():
         # 2018. 8. 18. 오후 6:45, sehan : ㅎㅇ
 
         if len(time_name_log) > 1:
-            time_name_log = [time_name_log[0]] + \
-                time_name_log[1].split(' : ', maxsplit=1)
+            time_name_log = [time_name_log[0]] + time_name_log[1].split(' : ', maxsplit=1)
             time_stamp = time_name_log[0]
             if len(time_stamp) >= 2:
                 if len(time_stamp.split('.')) == 4:
@@ -63,6 +62,6 @@ def preprocessing():
                         new_lines.append(time_name_log)
                         continue
 
-        new_lines[-1][2] += " " + line
+        new_lines[-1][2] += " " + line  # 채팅에 newline이 있는 경우
 
     return new_lines
