@@ -1,38 +1,11 @@
-with open("./datas/food_list.txt", 'r') as file:  
-    str = file.read()
-    food_list = str.split("\n")
-    food_list = list(set(food_list))
-    food_list.remove("-")
-    food_list2 = str.split("-")
-with open("./datas/place_name.txt", 'r') as file2:
-    place_name = file2.read().split('\n')
-with open("./datas/subway_station.txt", 'r') as file3:
-    subway_name = file3.read().split('\n')
-    place_name.extend(subway_name)
-
-
-def making_divide_list():   # food-list를 - 기준으로 category별로 list로 묶어 분류
-    food_list_middle = []
-    food_list_middle_two = []
-    for i in range(0, 8):
-        word = food_list2[i]
-        food_list_middle = word.split("\n")
-        if food_list_middle[0] == '':  # 처음, 끝 정보 없을경우 제거
-            del food_list_middle[0]
-        if food_list_middle[-1] == '':
-            del food_list_middle[-1]
-        food_list_middle_two.append(food_list_middle)
-    return food_list_middle_two
-
-
-category_list = making_divide_list()
+from sources import datas
 
 
 def food_category(food_name):
     for j in range(0, 8):
-        for k in range(0, len(category_list[j])):
-            if food_name == category_list[j][k]:
-                food_category = category_list[j][0]  # category-list의 첫번째 원소들이 category
+        for k in range(0, len(datas.food_category_list[j])):
+            if food_name == datas.food_category_list[j][k]:
+                food_category = datas.food_category_list[j][0]  # category-list의 첫번째 원소들이 category
     return food_category
 
 
@@ -41,14 +14,14 @@ def find_inform(sentence):
     question_food_category = []
     question_place_name = []
 
-    for food in food_list:
+    for food in datas.food_list:
         if food in sentence:
             kind = food_category(food)
             question_food_category.append(kind)
 
     question_food_category = list(set(question_food_category))  # 중복제거
 
-    for place in place_name:
+    for place in datas.place_list:
         if place in sentence:
             question_place_name.append(place)
 
