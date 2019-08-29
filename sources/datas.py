@@ -1,9 +1,9 @@
 from sources import manage_file
-import csv
+import pandas as pd
 
 # data file
-kakao = "./datas/kakao.txt"
-# kakao = "./datas/ADE_test_2.txt"
+# kakao = "./datas/kakao.txt"
+kakao = "./datas/ADE_test_2.txt"
 keyword = "./datas/question_keywords.txt"
 food = "./datas/food_list.txt"
 place = "./datas/place_name.txt"
@@ -54,7 +54,7 @@ except_list.extend(food_list)
 already = "./results/already_list.txt"  # 검색기록
 restaurant = "./results/restaurant.json"  # 식당 정보
 grade = "./results/grade.txt"
-match = "./results/match.csv"
+match = "./results/match.xlsx"
 
 already_list = manage_file.read_file_as_list(already)
 restaurant_dict = manage_file.read_json_as_dict(restaurant)  # 식당 정보
@@ -85,6 +85,9 @@ def save_grade(score_result):
 
 
 def save_match(match_result):
-    with open(match, 'w', encoding='utf-8') as file:
-        writer = csv.writer(file)
-        writer.writerows(match_result)
+    data = pd.DataFrame(match_result)
+    data.columns = ['질문', '답변', '식당']
+    data = data.set_index("질문")
+    writer = pd.ExcelWriter(match, engine='xlsxwriter')
+    data.to_excel(writer, sheet_name='Sheet1')
+    writer.save()

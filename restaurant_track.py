@@ -260,7 +260,7 @@ def find_match():
                 address = recommend["address"]
 
                 # 매칭 : [Q, A, 식당 정보]
-                match_result.append([str(q["sentence"]), str(a["sentence"]), title, category])
+                match_result.append([str(q["sentence"]), str(a["sentence"]), title])
 
                 # 식당 정보 : [식당명, 카테고리, 질문+답변 문장]
                 restaurant_data.append([title, category, q["sentence"] + " " + a["sentence"], address])
