@@ -298,3 +298,5 @@ if __name__ == "__main__":
         grade_question()
     elif args.match:
         find_match()
+    else:
+        find_match()
