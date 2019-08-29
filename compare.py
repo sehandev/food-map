@@ -35,11 +35,13 @@ for question in question_list:
 
     # 단어 치환
     for place in datas.place_list:
-        question = question.replace(place, "지역")
-    for restuarant in datas.restuarant_list:
-        question = question.replace(restuarant, "이름")
+        question = question.replace(place, " 지역 ")
+    for restaurant in datas.restaurant_list:
+        question = question.replace(restaurant, " 이름 ")
     for food in datas.food_list:
-        question = question.replace(food, "음식")
+        question = question.replace(food, " 음식 ")
+    question = question.replace('!', ' ! ')
+    question = question.replace('?', ' ? ')
 
     # pivot 기준으로 문장 나누기
     sentences = [question]
