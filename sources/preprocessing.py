@@ -3,6 +3,7 @@ from sources import datas
 
 def preprocessing():
     new_lines = []  # 새롭게 작성할 문서
+    pre_name = ""  # 중복 대화를 확인하기 위한 사용자명
     for line in datas.kakao_log[2:]:
 
         # 빈 줄 제거
@@ -54,12 +55,19 @@ def preprocessing():
 
         if len(time_name_log) > 1:
             time_name_log = [time_name_log[0]] + time_name_log[1].split(' : ', maxsplit=1)
-            time_stamp = time_name_log[0]
+            time_stamp = time_name_log[0]  # 대화 시간
+            user_name = time_name_log[1]  # 사용자명
+
             if len(time_stamp) >= 2:
                 if len(time_stamp.split('.')) == 4:
                     tmp = time_stamp.split('.')[3][1:3]
                     if tmp == "오전" or tmp == "오후":
-                        new_lines.append(time_name_log)
+                        if pre_name == user_name:
+                            # 이름이 같으면
+        	                new_lines[-1][2] += " " + time_name_log[2]  # 내용 연결
+                        else:
+                            pre_name = user_name
+                            new_lines.append(time_name_log)
                         continue
 
         new_lines[-1][2] += " " + line  # 채팅에 newline이 있는 경우
