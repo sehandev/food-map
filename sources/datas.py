@@ -24,11 +24,12 @@ unit_list = manage_file.read_file_as_list(unit_file)  # 단위
 subway_list = manage_file.read_file_as_list(subway_file)  # 지하철 역명
 except_list = manage_file.read_file_as_list(except_file)  # 제외할 단어
 
+place_list.extend(subway_list)
+
 except_list.extend(place_list)
 except_list.extend(category_list)
 except_list.extend(josa_list)
 except_list.extend(unit_list)
-except_list.extend(subway_list)
 
 
 def load_food():
