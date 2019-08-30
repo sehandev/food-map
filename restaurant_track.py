@@ -38,7 +38,7 @@ def track_name():
                 if results == -1:
                     # error
                     print("네이버 지역 검색 API 할당량을 초과했습니다")
-                    return -1, {}
+                    return -1
                 elif results != []:
                     # 정상
                     datas.restaurant_dict[noun] = results  # 검색결과 추가
@@ -58,23 +58,36 @@ def track_name():
 
     datas.update()
 
-    time_report("식당명 검색 완료", t_time)
+    time_report("식당 검색 완료", t_time)
 
     return processed_lines
 
 
-def grade_question():
+def grade_question(processed_lines):
     # 문장이 질문일 확률을 점수화
 
-    processed_lines = preprocessing.preprocessing()  # [ [시간1, 이름1, 내용1], [시간2, 이름2, 내용2], ... ]
+    print("질문 점수 확인")
 
     score_result = []
-    for time_log, name, sentence in processed_lines:
-        score, tokens = is_question.grade(sentence)
-        score_result.append([score, sentence, tokens])
+    for time_log, name, p_sentence in processed_lines:
+
+        # pivot 기준으로 문장 나누기
+        sentences = [p_sentence]
+        pivots = ["?", "!"]
+        for pivot in pivots:
+            sentences = split_with(pivot, sentences)
+
+        high_score = 0
+        for sentence in sentences:
+            score = is_question.grade(sentence)
+            if high_score < score:
+                high_score = score
+        score_result.append([high_score, p_sentence])
     score_result.sort(key=lambda x: x[0], reverse=True)
 
     datas.save_grade(score_result)
+
+    print("질문 점수 확인 완료\n")
 
 
 def split_with(pivot, sentences):
@@ -103,12 +116,14 @@ def split_with(pivot, sentences):
 def find_match():
     # A를 기준으로 Q match
 
-    print("식당 검색")
-    processed_lines = track_name()  # kakao_file에서 식당명 찾기
+    print("식당 검색 시작")
+    processed_lines = track_name()  # kakao_file에서 식당 찾기
 
     if processed_lines == -1:
         # error
         return
+
+    grade_question(processed_lines)
 
     match_list = []  # match된 QA
     count = 1
@@ -170,17 +185,17 @@ def find_match():
                 # 이 문장이 답변이 아니었으면
 
                 # 질문 찾기
-                score, tokens = is_question.grade(sentence)
+                score = is_question.grade(sentence)
                 category, location = find_inform.find_inform(sentence)
-                if 0.7 <= score:
+                if datas.score <= score:
                     # 확정
                     match_list.append({"name": name, "time": time_log, "sentence": sentence, "QAN": "Q", "location": location, "category": category})
                     check = 0
-                elif 0.6 <= score < 0.7:
-                    # 확인이 필요한 문장
-                    match_list.append({"name": name, "time": time_log, "sentence": sentence, "QAN": "QN", "location": location, "category": category})
-                    check = 0
-                elif score < 0.6:
+                # elif 14.5 <= score < 16.5:
+                #     # 확인이 필요한 문장
+                #     match_list.append({"name": name, "time": time_log, "sentence": sentence, "QAN": "QN", "location": location, "category": category})
+                #     check = 0
+                elif score < datas.score:
                     # 점수 미달
                     check = 1
 
@@ -298,4 +313,5 @@ if __name__ == "__main__":
     elif args.match:
         find_match()
     else:
+        grade_question()
         find_match()

@@ -11,6 +11,7 @@ josa = "./datas/josa_list.txt"
 unit_file = "./datas/unit_list.txt"
 subway_file = "./datas/subway_station.txt"
 except_file = "./datas/except_list.txt"
+score_file = "./datas/check_score.txt"
 
 kakao_log = manage_file.read_file_as_list(kakao)  # 카카오톡 채팅 로그
 keyword_dict = manage_file.read_txt_as_dict(keyword)  # 질문 점수
@@ -22,6 +23,7 @@ josa_list = manage_file.read_file_as_list(josa)  # 조사
 unit_list = manage_file.read_file_as_list(unit_file)  # 단위
 subway_list = manage_file.read_file_as_list(subway_file)  # 지하철 역명
 except_list = manage_file.read_file_as_list(except_file)  # 제외할 단어
+score = float(manage_file.read_file_as_list(score_file)[0])  # 질문 점수
 
 place_list.extend(subway_list)
 
@@ -74,12 +76,9 @@ def save_restaurant():
 
 def save_grade(score_result):
     with open(grade, 'w', encoding='utf-8') as file:
-        for score, sentence, tokens in score_result:
+        for score, sentence in score_result:
             file.write(str(score) + " : ")
-            file.write("{0:100}".format(sentence))
-            file.write("// ")
-            for token in tokens:
-                file.write(token + " ")
+            file.write(sentence)
             file.write('\n')
 
 
