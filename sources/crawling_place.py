@@ -1,7 +1,9 @@
 import requests
 from bs4 import BeautifulSoup
 from sources import find_tag
+import re
 
+number = re.compile("[^[0-9]+")
 
 def set_data(place_list):
     name = place_list[0]
@@ -49,8 +51,15 @@ def findprice(soup):
     prices = []
 
     for line in par_price:
-        price_t = int(line.get_text().replace("원", "").replace(",", ""))
-        prices.append(price_t)
+        price_t = line.get_text()
+        price_t = number.sub(" ", price_t)
+
+        try:
+            price_t = price_t.split()[0]
+            price_t = int(price_t)
+            prices.append(price_t)
+        except:
+            pass
 
     if prices == []:
         price = 0

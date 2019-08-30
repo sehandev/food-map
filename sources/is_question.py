@@ -24,20 +24,20 @@ def grade(line):
     check_list = [0 for i in range(len(datas.keyword_list))]
     for token in tokens:
         for i in range(len(datas.keyword_list)):
-            if token == datas.keyword_list[i]:
-                check_list[i] = float(datas.keyword_dict[token])
+            if token[0:len(datas.keyword_list[i])] == datas.keyword_list[i]:
+                check_list[i] = float(datas.keyword_dict[datas.keyword_list[i]])
 
     # check 점수, 개수 확인
     for check in check_list:
-        if check > 0:
+        if check != 0:
             score += check
             count += 1
 
     # 점수 평균
-    if count > 1:
+    if count > 2:
         score /= len(tokens)
         score = round(score, 2)
     else:
         score = 0
 
-    return score, tokens
+    return score
