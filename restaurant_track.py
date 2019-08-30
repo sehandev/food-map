@@ -1,6 +1,5 @@
-from sources import preprocessing, find_noun, except_string, naver_local, is_question, find_inform, answer_check, category_regularation, crawling_place, text_export, datas, find_tag
+from sources import answer_check, category_regularation, crawling_place, datas, except_string, find_inform, find_noun, find_tag, is_question, naver_local, preprocessing, text_export
 import time
-import signal
 import pathlib
 import json
 import argparse
