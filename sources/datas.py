@@ -2,8 +2,7 @@ from sources import manage_file
 import pandas as pd
 
 # data file
-# kakao = "./datas/kakao.txt"
-kakao = "./datas/ADE_test_2.txt"
+kakao = "./datas/kakao.txt"
 keyword = "./datas/question_keywords.txt"
 food = "./datas/food_list.txt"
 place = "./datas/place_name.txt"
@@ -44,7 +43,7 @@ def load_food():
             if food_list_middle[-1] == '':
                 del food_list_middle[-1]
             food_category_list.append(food_list_middle)
-            food_list.extend(food_list_middle[1:])
+            food_list.extend(food_list_middle)
 
 
 load_food()
