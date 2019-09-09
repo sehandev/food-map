@@ -12,7 +12,6 @@ parser.add_argument("--match", help="find match of question and answer", action=
 args = parser.parse_args()
 
 
-
 def time_report(message, t_time):
     # message와 함께 진행시간 출력
 
@@ -66,7 +65,7 @@ def track_name():
 def grade_question(processed_lines):
     # 문장이 질문일 확률을 점수화
 
-    print("질문 점수 확인")
+    print("질문 점수 확인 시작")
 
     score_result = []
     for time_log, name, p_sentence in processed_lines:
@@ -239,7 +238,6 @@ def find_match():
 
                         match, _ = answer_check.location_find(match, match_list[i]["title"], location)  # 지역명과 함께 검색해서 우선순위 변경
 
-
                     for grade in range(3):
                         for restaurant in match[grade]:
                             a_category = category_regularation.find_category(restaurant["category"])
@@ -253,7 +251,6 @@ def find_match():
                                         tag_score = tag_score + 1
                                 if a_category == q_category:
                                     category_score = 1
-
 
                             new_score = location_score - grade + category_score + (j * 0.1) + tag_score
                             if match_score < new_score:
@@ -308,10 +305,7 @@ def find_match():
 if __name__ == "__main__":
     if args.track:
         track_name()
-    elif args.grade:
-        grade_question()
     elif args.match:
         find_match()
     else:
-        grade_question()
         find_match()

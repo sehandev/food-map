@@ -4,16 +4,18 @@ from sources import datas
 def preprocessing():
     new_lines = []  # 새롭게 작성할 문서
     pre_name = ""  # 중복 대화를 확인하기 위한 사용자명
+    date = ""
     for line in datas.kakao_log[2:]:
 
         # 빈 줄 제거
         if line == "":
             continue
 
-        # 2018년 8월 19일 일요일
-        if 15 <= len(line) <= 18:
-            if line[4] == "년" and line[-5] == "일" and line[-2:] == "요일":
-                continue
+        # --------------- 2019년 7월 22일 월요일 ---------------
+        tmp_line = line.replace("-", "").strip().rstrip()
+        if 15 <= len(tmp_line) <= 18:
+            if tmp_line[4] == "년" and tmp_line[-5] == "일" and tmp_line[-2:] == "요일":
+                date = tmp_line
 
         # 2018. 8. 22. 오후 8:20: sehan님이 들어왔습니다.
         if line[-7:] == "들어왔습니다.":
@@ -49,26 +51,20 @@ def preprocessing():
 
         line = line.replace("이모티콘", '')
 
-        time_name_log = line.split(',', maxsplit=1)
+        name_time_log = line.split(']', maxsplit=2)
 
-        # 2018. 8. 18. 오후 6:45, sehan : ㅎㅇ
+        # [YiDK] [오후 6:07] 오늘부터였나
 
-        if len(time_name_log) > 1:
-            time_name_log = [time_name_log[0]] + time_name_log[1].split(' : ', maxsplit=1)
-            time_stamp = time_name_log[0]  # 대화 시간
-            user_name = time_name_log[1]  # 사용자명
-
-            if len(time_stamp) >= 2:
-                if len(time_stamp.split('.')) == 4:
-                    tmp = time_stamp.split('.')[3][1:3]
-                    if tmp == "오전" or tmp == "오후":
-                        if pre_name == user_name:
-                            # 이름이 같으면
-        	                new_lines[-1][2] += " " + time_name_log[2]  # 내용 연결
-                        else:
-                            pre_name = user_name
-                            new_lines.append(time_name_log)
-                        continue
+        if len(name_time_log) > 2:
+            user_name = name_time_log[0].split('[')  # 사용자명
+            log = name_time_log[2][1:]  # 대화 내용
+            if pre_name == user_name:
+                # 이름이 같으면
+                new_lines[-1][1] += " " + log  # 내용 연결
+            else:
+                pre_name = user_name
+                new_lines.append([date, user_name, log])
+            continue
 
         new_lines[-1][2] += " " + line  # 채팅에 newline이 있는 경우
 
